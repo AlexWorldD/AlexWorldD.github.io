@@ -1,9 +1,10 @@
 body {
+    max-width: 960px;
     background-color: lightblue;
     font-family: "Open Sans";
 }
 
 h1 {
-    color: navy;
-    margin-left: 20px;
+    color: #1946ba;
+    margin-left: 10px;
 }
