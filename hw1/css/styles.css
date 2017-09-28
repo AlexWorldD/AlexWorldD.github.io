@@ -39,13 +39,71 @@ div.Day {
 .quote-container {
     margin-left: 6%;
 }
-.change-btn {
+
+#another {
+    color: gray;
+}
+#another > .quote-message {
+    border-left-color: lightgrey
+}
+/* Styles for DropDown Authors' list */
+
+.container button:hover, .container button:focus {
+    background-color: #F92F62;
+}
+
+.dropdown {
+    float: 0;
+    display: inline-block;
+    
+}
+
+.dropdown_content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown_content a {
+    font-size: 12px;
+    color: black;
+    padding: 6px 7px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown_content a:hover {background-color: #f1f1f1}
+
+
+.show {display:block;}
+
+.container {
+    overflow: hidden;
+    font-family: Arial;
+}
+.container button, select {
     background-color: #ec0b43;
     border: none;
+    float: left;
     font-size: 12px;
-    margin: 0;
+    color: white;
+    text-align: center;
+    padding: 6px 7px;
+    margin-right: 5px;
+    text-decoration: none;
     cursor: pointer;
+}
+.dropdown .change-btn_V3 {
+    cursor: pointer;
+    font-size: 12px;    
+    border: none;
+    outline: none;
     color: white;
     padding: 6px 7px;
-    text-align: center;
+    background-color: #ec0b43;
 }
