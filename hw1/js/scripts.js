@@ -38,16 +38,14 @@ function change_v2() {
             var tmp = Array.from({
                 length: 5
             }, () => Math.floor(Math.random() * 4000));
-            document.getElementById("quote").innerHTML = data[tmp[0]].quoteText;
-            document.getElementById("author").innerHTML = data[tmp[0]].quoteAuthor;
-            document.getElementById("q1").innerHTML = data[tmp[1]].quoteText;
-            document.getElementById("a1").innerHTML = data[tmp[1]].quoteAuthor;
-            document.getElementById("q2").innerHTML = data[tmp[2]].quoteText;
-            document.getElementById("a2").innerHTML = data[tmp[2]].quoteAuthor;
-            document.getElementById("q3").innerHTML = data[tmp[3]].quoteText;
-            document.getElementById("a3").innerHTML = data[tmp[3]].quoteAuthor;
-            document.getElementById("q4").innerHTML = data[tmp[4]].quoteText;
-            document.getElementById("a4").innerHTML = data[tmp[4]].quoteAuthor;
+            document.getElementById("quote").innerHTML = data[tmp[4]].quoteText;
+            document.getElementById("author").innerHTML = data[tmp[4]].quoteAuthor;
+            var q_list = document.getElementsByClassName("q_text");
+            var a_list = document.getElementsByClassName("q_author");
+            for (var t_t=0; t_t<4; t_t++) {
+                q_list[t_t].innerHTML = data[tmp[t_t]].quoteText;
+                a_list[t_t].innerHTML = data[tmp[t_t]].quoteAuthor;
+            } 
         }
     };
     xhr.open("GET", quotesPath, true);
@@ -59,38 +57,27 @@ function change_v3() {
 }
 
 function sort_q() {
-    var sort_me = [{
-            "quote": document.getElementById("q1").innerHTML
-            , "author": document.getElementById("a1").innerHTML
+    var sort_me = [];
+    var q_list = Array.from(document.getElementsByClassName("q_text"));
+    var a_list = document.getElementsByClassName("q_author");
+    // Build Dictionary here ->
+    q_list.forEach((key, idx) => sort_me.push({"quote": key.innerHTML, "author":  a_list[idx].innerHTML}));
+    // Sorting
+    sort_me.sort(function (a, b) {
+        if (a.quote > b.quote) {
+            return 1;
         }
-        , {
-            "quote": document.getElementById("q2").innerHTML
-            , "author": document.getElementById("a2").innerHTML
+        else if (a.quote < b.quote) {
+            return -1;
         }
-        , {
-            "quote": document.getElementById("q3").innerHTML
-            , "author": document.getElementById("a3").innerHTML
-        }
-        , {
-            "quote": document.getElementById("q4").innerHTML
-            , "author": document.getElementById("a4").innerHTML
-        }].sort(function (a, b) {
-        if(a.quote > b.quote){
-        return 1;
-       }
-        else if(a.quote < b.quote){
-        return -1;
-       } 
-       return 0;
+        return 0;
     });
-    document.getElementById("q1").innerHTML = sort_me[0].quote;
-    document.getElementById("a1").innerHTML = sort_me[0].author;
-    document.getElementById("q2").innerHTML = sort_me[1].quote;
-    document.getElementById("a2").innerHTML = sort_me[1].author;
-    document.getElementById("q3").innerHTML = sort_me[2].quote;
-    document.getElementById("a3").innerHTML = sort_me[2].author;
-    document.getElementById("q4").innerHTML = sort_me[3].quote;
-    document.getElementById("a4").innerHTML = sort_me[3].author;
+    var q_list = document.getElementsByClassName("q_text");
+    var a_list = document.getElementsByClassName("q_author");
+    for (var t_t=0; t_t<4; t_t++) {
+                q_list[t_t].innerHTML = sort_me[t_t].quote
+                a_list[t_t].innerHTML = sort_me[t_t].author;
+            }
 }
 window.onclick = function (event) {
     if (!event.target.matches('.change-btn_V3')) {
