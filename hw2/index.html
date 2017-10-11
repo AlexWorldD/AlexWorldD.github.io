@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Homework #1</title>
+    <meta name="description" content="HW1">
+    <meta name="author" content="iLex">
+    <link rel="stylesheet" href="css/styles.css?v=1.0">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+    <div class="content">
+        <h1>First VIS101 Homework</h1>
+        <div class="Day">
+            <h2>Quote Of the Day:</h2>
+            <div class="quote-container">
+                <div class="quote-message" data-role="message">
+                    <blockquote cite="https://docs.google.com/document/d/1baobKdb6jIW8gNQ7Wj1PfQkMl-onLxqnyCYvIAJph8I/edit"> <span id="quote">“All successful men and women are big dreamers. They imagine what their future could be, ideal in every respect, and then they work every day toward their distant vision, that goal or purpose.”</span> – <span id="author">Brian Tracy</span> </blockquote>
+                </div>
+            </div>
+            <h2 style="color: gray;">Other quotes:</h2>
+            <div class="quote-container" id='another'>
+                <div class="quote-message sort_me" data-role="message">
+                    <blockquote> <span class="q_text">“I'm selfish, impatient and a little insecure. I make mistakes, I am out of control and at times hard to handle. But if you can't handle me at my worst, then you sure as hell don't deserve me at my best.”</span> – <span class="q_author">Marilyn Monroe</span> </blockquote>
+                </div>
+                <div class="quote-message sort_me" data-role="message">
+                    <blockquote> <span class="q_text">“Don't cry because it's over, smile because it happened.”</span> – <span class="q_author">Dr. Seuss</span> </blockquote>
+                </div>
+                <div class="quote-message sort_me" data-role="message">
+                    <blockquote> <span class="q_text">“Be yourself; everyone else is already taken.” </span> – <span class="q_author">Oscar Wilde</span> </blockquote>
+                </div>
+                <div class="quote-message sort_me" data-role="message">
+                    <blockquote> <span class="q_text">“Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.” </span> – <span class="q_author">Albert Einstein</span> </blockquote>
+                </div>
+            </div>
+        </div>
+        <br>
+        <form>
+            <div class="container">
+                <button class="change-btn" onclick="change()" type="button">Change Quote Of the Day</button>
+                <button class="change-btn" onclick="sort_q()" type="button">Sort Quotes!</button>
+                <button class="change-btn" onclick="change_v2()" type="button">Give me Random Quotes!</button>
+                <!--
+                <div class="dropdown">
+                    <button class="change-btn_V3" onclick="change_v3()" type="button">Random Quote with Author</button>
+                    <select id='AuthorList' class="dropdown_content">
+                        <option href="#">Link 1</option>
+                        <option href="#">Link 2</option>
+                        <option href="#">Link 3</option>
+                    </select>
+                </div>
+-->
+<!--
+                <select id='AuthorList' class="change-btn_V3" name="Random Quote with Author">
+                    <option value="">Random Quote with Author</option>
+                    <option>Link 1</option>
+                    <option>Link 2</option>
+                    <option>Link 3</option>
+                </select>
+-->
+            </div>
+        </form>
+    </div>
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
