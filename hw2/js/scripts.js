@@ -30,7 +30,6 @@
 var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
 var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
 d3.json("data/countries_2012.json", function (error, data) {
-    //var columns = Object.keys(data[0]);
     var columns = required_columns;
     // TODO such an awful code... but should work.
     data = data.map(function (t) {
@@ -47,10 +46,10 @@ d3.json("data/countries_2012.json", function (error, data) {
     var columns1 = [
         {head: 'Name', cl: 'title', html: d3.f('Name')},
         {head: 'Continent', cl: 'center', html: d3.f('Continent')},
-        {head: 'GPD', cl: 'num', html: d3.f('GPD', d3.format('$,.2s'))},
+        {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
         {head: 'Life Expectancy', cl: 'num', html: d3.f('Life Expectancy', d3.format('.1f'))},
         {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
-        {head: 'Year', cl: 'num', html: d3.f('Year', d3.format('.0f'))}
+        {head: 'Year', cl: 'center', html: d3.f('Year', d3.format('.0f'))}
     ];
     var sortAscending = true;
     // Build a table. ~Empty table~
@@ -70,18 +69,7 @@ d3.json("data/countries_2012.json", function (error, data) {
         .text(function (d) {
             return d.head;
         });
-    // headers.on('click', function (header) {
-    //     headers.attr('class', 'header');
-    //     if (sortAscending) {
-    //         rows.sort(function(a, b) { return b[header] < a[header]; });
-    //         sortAscending = false;
-    //         this.className = 'aes';
-    //     } else {
-    //         rows.sort(function(a, b) { return b[header] > a[header]; });
-    //         sortAscending = true;
-    //         this.className = 'des';
-    //     }
-    // })
+
     headers.on("click", function (header) {
         headers.attr('class', 'header');
         if (sortAscending) {
@@ -109,17 +97,28 @@ d3.json("data/countries_2012.json", function (error, data) {
             this.className = 'des';
         }
     });
+    var rows = tbody.selectAll("tr.row")
+        .data(data)
+        .enter()
+        .append("tr").attr("class", "row");
 
-    var rows = tbody.selectAll("tr.row");
-    //     .data(data)
-    //     .enter()
-    //     .append("tr").attr("class", "row");
-
-    tbody
-        .appendMany(data, 'tr')
-        .attr("class", "row")
+    var cells = rows
         .appendMany(td_data, 'td')
-        .html(d3.f('html'));
+        .html(d3.f('html'))
+        .attr('class', d3.f('cl'))
+        .on("mouseover", function (d, i) {
+
+            d3.select(this.parentNode)
+                .style("background-color", "#ffb0bf");
+
+        }).on("mouseout", function () {
+
+            tbody.selectAll("tr")
+                .style("background-color", null)
+                .selectAll("td")
+                .style("background-color", null);
+
+        });
 
     function td_data(row, i) {
         return columns1.map(function (c) {
@@ -131,29 +130,6 @@ d3.json("data/countries_2012.json", function (error, data) {
             return cell;
         });
     }
-
-    // var cells = rows.selectAll("td")
-    //     .data(function (row) {
-    //         return d3.range(Object.keys(row).length).map(function (column, i) {
-    //             return row[Object.keys(row)[i]];
-    //         });
-    //     })
-    //     .enter()
-    //     .append("td")
-    //     .html(d3.f('html'))
-    //     .on("mouseover", function (d, i) {
-    //
-    //         d3.select(this.parentNode)
-    //             .style("background-color", "#F3ED86");
-    //
-    //     }).on("mouseout", function () {
-    //
-    //         tbody.selectAll("tr")
-    //             .style("background-color", null)
-    //             .selectAll("td")
-    //             .style("background-color", null);
-    //
-    //     });
 
 })
 ;
