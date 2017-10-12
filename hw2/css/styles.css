@@ -31,3 +31,7 @@ th.aes:after {
     color: black;
     content: "\21E7";
 }
+th { text-align: left; }
+th, td { padding: 0.5ex 1em 0.5ex 1em;}
+th.center, td.center { text-align: center; }
+td.num { text-align: right; }
