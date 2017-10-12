@@ -44,14 +44,14 @@ d3.json("data/countries_2012.json", function (error, data) {
         };
     });
     // column definitions
-    // var columns1 = [
-    //     { head: 'Name', cl: 'title', html: d3.f('Name') },
-    //     { head: 'Continent', cl: 'center', html: d3.f('Continent') },
-    //     { head: 'GPD', cl: 'num', html: d3.f('GPD', d3.format('$,.2s')) },
-    //     { head: 'Life Expectancy', cl: 'num', html: d3.f('Life Expectancy', d3.format('.1f')) },
-    //     { head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f')) },
-    //     { head: 'Year', cl: 'num', html: d3.f('Year', d3.format('.0f')) }
-    // ];
+    var columns1 = [
+        {head: 'Name', cl: 'title', html: d3.f('Name')},
+        {head: 'Continent', cl: 'center', html: d3.f('Continent')},
+        {head: 'GPD', cl: 'num', html: d3.f('GPD', d3.format('$,.2s'))},
+        {head: 'Life Expectancy', cl: 'num', html: d3.f('Life Expectancy', d3.format('.1f'))},
+        {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
+        {head: 'Year', cl: 'num', html: d3.f('Year', d3.format('.0f'))}
+    ];
     var sortAscending = true;
     // Build a table. ~Empty table~
     var table = d3.select(".content").append("table"),
@@ -64,11 +64,11 @@ d3.json("data/countries_2012.json", function (error, data) {
 
     // Putting our data to table
     var headers = thead.append("tr").selectAll("th")
-        .data(columns)
+        .data(columns1)
         .enter()
         .append("th")
         .text(function (d) {
-            return d;
+            return d.head;
         });
     // headers.on('click', function (header) {
     //     headers.attr('class', 'header');
@@ -87,8 +87,8 @@ d3.json("data/countries_2012.json", function (error, data) {
         if (sortAscending) {
             rows.sort(function (a, b) {
                 sortAscending = false;
-                var t = d3.ascending(a[header], b[header]);
-                if (t==0 && header=='Continent') {
+                var t = d3.ascending(a[header.head], b[header.head]);
+                if (t == 0 && header.head == 'Continent') {
                     return d3.ascending(a['Name'], b['Name'])
                 }
                 else return t;
@@ -98,8 +98,8 @@ d3.json("data/countries_2012.json", function (error, data) {
         else {
             rows.sort(function (a, b) {
                 sortAscending = true;
-                var t = d3.descending(a[header], b[header]);
-                if (t==0 && header=='Continent') {
+                var t = d3.descending(a[header.head], b[header.head]);
+                if (t == 0 && header.head == 'Continent') {
                     // TODO or change to des too?
                     return d3.ascending(a['Name'], b['Name'])
                 }
@@ -107,36 +107,53 @@ d3.json("data/countries_2012.json", function (error, data) {
 
             });
             this.className = 'des';
-        }});
-    var rows = tbody.selectAll("tr.row")
-        .data(data)
-        .enter()
-        .append("tr").attr("class", "row");
+        }
+    });
 
-    var cells = rows.selectAll("td")
-        .data(function (row) {
-            return d3.range(Object.keys(row).length).map(function (column, i) {
-                return row[Object.keys(row)[i]];
+    var rows = tbody.selectAll("tr.row");
+    //     .data(data)
+    //     .enter()
+    //     .append("tr").attr("class", "row");
+
+    tbody
+        .appendMany(data, 'tr')
+        .attr("class", "row")
+        .appendMany(td_data, 'td')
+        .html(d3.f('html'));
+
+    function td_data(row, i) {
+        return columns1.map(function (c) {
+            // compute cell values for this specific row
+            var cell = {};
+            d3.keys(c).forEach(function (k) {
+                cell[k] = typeof c[k] == 'function' ? c[k](row, i) : c[k];
             });
-        })
-        .enter()
-        .append("td")
-        .html(function (d) {
-            return d;
-        })
-        .on("mouseover", function (d, i) {
-
-            d3.select(this.parentNode)
-                .style("background-color", "#F3ED86");
-
-        }).on("mouseout", function () {
-
-            tbody.selectAll("tr")
-                .style("background-color", null)
-                .selectAll("td")
-                .style("background-color", null);
-
+            return cell;
         });
+    }
+
+    // var cells = rows.selectAll("td")
+    //     .data(function (row) {
+    //         return d3.range(Object.keys(row).length).map(function (column, i) {
+    //             return row[Object.keys(row)[i]];
+    //         });
+    //     })
+    //     .enter()
+    //     .append("td")
+    //     .html(d3.f('html'))
+    //     .on("mouseover", function (d, i) {
+    //
+    //         d3.select(this.parentNode)
+    //             .style("background-color", "#F3ED86");
+    //
+    //     }).on("mouseout", function () {
+    //
+    //         tbody.selectAll("tr")
+    //             .style("background-color", null)
+    //             .selectAll("td")
+    //             .style("background-color", null);
+    //
+    //     });
 
 })
 ;
