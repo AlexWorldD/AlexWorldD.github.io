@@ -13,97 +13,21 @@ h2 {
     margin-left: 2%;
 }
 
-blockquote {
-    margin-left: 1%;
-}
-
-div.Day {
-    border-style: solid;
-    border-color: #F5F5F5;  
-}
 
 .content {
     margin-left: auto;
     margin-right: auto;
     max-width: 960px;
 }
-
-.quote-message {
-    line-height: inherit;
-    border-left: 2px solid;
-    border-left-color: grey;
-    padding: 0 0 0 0;
-    margin: 0 0 0 0;   
+tr:nth-child(even) {
+    background-color: aliceblue;
 }
-
-.quote-container {
-    margin-left: 6%;
-}
-
-#another {
-    color: gray;
-}
-#another > .quote-message {
-    border-left-color: lightgrey
-}
-/* Styles for DropDown Authors' list */
-
-.container button:hover, .container button:focus {
-    background-color: #F92F62;
-}
-
-.dropdown {
-    float: 0;
-    display: inline-block;
-    
-}
-
-.dropdown_content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-/* Links inside the dropdown */
-.dropdown_content a {
-    font-size: 12px;
+th.des:after {
     color: black;
-    padding: 6px 7px;
-    text-decoration: none;
-    display: block;
+    content: "\21E9";
 }
 
-/* Change color of dropdown links on hover */
-.dropdown_content a:hover {background-color: #f1f1f1}
-
-
-.show {display:block;}
-
-.container {
-    overflow: hidden;
-    font-family: Arial;
-}
-.container button, select {
-    background-color: #ec0b43;
-    border: none;
-    float: left;
-    font-size: 12px;
-    color: white;
-    text-align: center;
-    padding: 6px 7px;
-    margin-right: 5px;
-    text-decoration: none;
-    cursor: pointer;
-}
-.dropdown .change-btn_V3 {
-    cursor: pointer;
-    font-size: 12px;    
-    border: none;
-    outline: none;
-    color: white;
-    padding: 6px 7px;
-    background-color: #ec0b43;
+th.aes:after {
+    color: black;
+    content: "\21E7";
 }
