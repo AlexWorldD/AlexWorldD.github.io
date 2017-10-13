@@ -110,7 +110,9 @@ d3.json("data/countries_2012.json", function (error, data) {
     var cells = rows
         .appendMany(td_data, 'td')
         .html(d3.f('html'))
-        .attr('class', d3.f('cl'))
+        .attr('class', d3.f('cl'));
+
+    cells
         .on("mouseover", function (d, i) {
 
             d3.select(this.parentNode)
@@ -157,7 +159,32 @@ d3.json("data/countries_2012.json", function (error, data) {
         else {
             newData = req_data;
         }
-        alert(newData)
+
+        tbody.selectAll("tr.row").html('');
+        var newRows = tbody.selectAll("tr.row")
+            .data(newData);
+        newRows
+            .enter()
+            .append("tr").attr("class", "row");
+
+        newRows.exit().remove();
+        rows = newRows;
+        var cells = rows
+            .appendMany(td_data, 'td')
+            .html(d3.f('html'))
+            .attr('class', d3.f('cl'));
+
+        var newCells = rows.data(td_data);
+        newCells
+            .enter()
+            .append('td')
+            .html(d3.f('html'))
+            .attr('class', d3.f('cl'));
+        newCells.exit().remove();
+        cells = newCells;
+        // cells.appendMany(td_data, 'td')
+        //     .html(d3.f('html'))
+        //     .attr('class', d3.f('cl'));
     }
 
 })
