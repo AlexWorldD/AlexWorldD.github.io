@@ -27,6 +27,26 @@
 //     :
 //     2012
 
+var req_data;
+function filter_table() {
+    var choices = [];
+    var t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
+        var temp = d3.select(this);
+        if (temp.property("checked")) {
+            choices.push(temp.property("value"));
+        };
+    });
+    var newData;
+    if (choices.length>0) {
+        newData = req_data.filter(function (d, i) {
+        return choices.includes(d.Continent);
+    })}
+        else {
+        newData = req_data;
+        }
+    alert(newData)
+}
+
 var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
 var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
 d3.json("data/countries_2012.json", function (error, data) {
@@ -42,6 +62,7 @@ d3.json("data/countries_2012.json", function (error, data) {
             'Year': t.year
         };
     });
+    req_data = data;
     // column definitions
     var columns1 = [
         {head: 'Name', cl: 'title', html: d3.f('Name')},
@@ -53,7 +74,7 @@ d3.json("data/countries_2012.json", function (error, data) {
     ];
     var sortAscending = true;
     // Build a table. ~Empty table~
-    var table = d3.select(".content").append("table"),
+    var table = d3.select(".table").append("table"),
         thead = table.append("thead")
             .attr("class", "thead");
     tbody = table.append("tbody");
@@ -129,6 +150,27 @@ d3.json("data/countries_2012.json", function (error, data) {
             });
             return cell;
         });
+    }
+    // Set the trigger for our filtering
+    d3.selectAll("input[type=checkbox]").on("change", filter_table);
+    
+    function filter_table() {
+        var choices = [];
+        var t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
+            var temp = d3.select(this);
+            if (temp.property("checked")) {
+                choices.push(temp.property("value"));
+            };
+        });
+        var newData;
+        if (choices.length>0) {
+            newData = req_data.filter(function (d, i) {
+                return choices.includes(d.Continent);
+            })}
+        else {
+            newData = req_data;
+        }
+        alert(newData)
     }
 
 })
