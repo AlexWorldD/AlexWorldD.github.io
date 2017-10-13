@@ -17,6 +17,7 @@ h2 {
 .content {
     margin-left: auto;
     margin-right: auto;
+    padding: 2em;
     max-width: 960px;
 }
 tr:nth-child(even) {
@@ -35,3 +36,30 @@ th { text-align: left; }
 th, td { padding: 0.5ex 1em 0.5ex 1em;}
 th.center, td.center { text-align: center; }
 td.num { text-align: right; }
+
+#filter {
+    margin: 0 0 1em 0;
+}
+.container label {
+    border: none;
+    font-size: 16px;
+    color: black;
+    text-align: center;
+    padding: 6px 7px;
+    margin-right: 5px;
+    margin-left: 1em;
+    text-decoration: none;
+    cursor: pointer;
+}
+div.filters {
+    border-style: solid;
+    border-color: aliceblue;
+    padding: 1em;
+}
+.table {
+    margin-top: 2em;
+}
+.container span {
+    float: left;
+    width: 80px;
+}
