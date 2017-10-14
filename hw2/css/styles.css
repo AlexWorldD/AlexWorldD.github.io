@@ -46,6 +46,7 @@ table.fixed th:nth-child(4) {width:15%;}/*Setting the width of column 3.*/
 table.fixed th:nth-child(5) {width:20%;}/*Setting the width of column 3.*/
 table.fixed th:nth-child(6) {width:15%;}/*Setting the width of column 3.*/
 
+
 #filter {
     margin: 0 0 1em 0;
 }

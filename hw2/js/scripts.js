@@ -28,6 +28,7 @@
 //     2012
 
 var req_data;
+
 // column definitions
 var columns1 = [
     {head: 'Name', cl: 'title', html: d3.f('Name')},
