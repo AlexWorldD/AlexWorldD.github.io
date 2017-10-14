@@ -78,7 +78,7 @@ d3.json("data/countries_2012.json", function (error, data) {
     headers.on("click", function (header) {
         headers.attr('class', 'header');
         if (sortAscending) {
-            rows.sort(function (a, b) {
+            tbody.selectAll("tr.row").sort(function (a, b) {
                 sortAscending = false;
                 var t = d3.ascending(a[header.head], b[header.head]);
                 if (t == 0 && header.head == 'Continent') {
@@ -89,7 +89,7 @@ d3.json("data/countries_2012.json", function (error, data) {
             this.className = 'aes';
         }
         else {
-            rows.sort(function (a, b) {
+            tbody.selectAll("tr.row").sort(function (a, b) {
                 sortAscending = true;
                 var t = d3.descending(a[header.head], b[header.head]);
                 if (t == 0 && header.head == 'Continent') {
@@ -104,20 +104,18 @@ d3.json("data/countries_2012.json", function (error, data) {
     });
 
     // Start putting our data to table
-    var rows = tbody.selectAll("tr.row")
+    tbody.selectAll("tr.row")
         .data(data)
         .enter()
         .append("tr").attr("class", "row");
 
-    var cells = rows
+    tbody.selectAll("tr.row")
         .selectAll('td')
         .data(td_data)
         .enter()
         .append('td')
         .html(d3.f('html'))
-        .attr('class', d3.f('cl'));
-
-    cells
+        .attr('class', d3.f('cl'))
         .on("mouseover", function (d, i) {
 
             d3.select(this.parentNode)
@@ -152,7 +150,8 @@ d3.json("data/countries_2012.json", function (error, data) {
             var temp = d3.select(this);
             if (temp.property("checked")) {
                 choices.push(temp.property("value"));
-            };
+            }
+            ;
         });
         var newData;
         if (choices.length > 0) {
@@ -172,8 +171,8 @@ d3.json("data/countries_2012.json", function (error, data) {
                 .duration(0)
                 .style('opacity', 0.0)
                 .remove();
-            n_rows  = n_rows.enter()
-                .append("tr").attr("class", "row").merge(n_rows);
+            n_rows = n_rows.enter()
+                .append("tr").attr("class", "row");
 
             n_cells = n_rows
                 .selectAll('td')
@@ -190,9 +189,7 @@ d3.json("data/countries_2012.json", function (error, data) {
                 .html(d3.f('html'))
                 .attr('class', d3.f('cl'))
                 .merge(n_cells);
-
         }
-
         update(newData);
         // tbody.selectAll("tr.row").html('');
         // var newRows = tbody.selectAll("tr.row")
