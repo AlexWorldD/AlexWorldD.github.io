@@ -29,6 +29,25 @@
 
 var req_data;
 
+// column definitions
+var columns1 = [
+    {head: 'Name', cl: 'title', html: d3.f('Name')},
+    {head: 'Continent', cl: 'center', html: d3.f('Continent')},
+    {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
+    {head: 'Life Expectancy', cl: 'center', html: d3.f('Life Expectancy', d3.format('.1f'))},
+    {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
+    {head: 'Year', cl: 'center', html: d3.f('Year', d3.format('.0f'))}
+];
+function td_data(row, i) {
+    return columns1.map(function (c) {
+        // compute cell values for this specific row
+        var cell = {};
+        d3.keys(c).forEach(function (k) {
+            cell[k] = typeof c[k] == 'function' ? c[k](row, i) : c[k];
+        });
+        return cell;
+    });
+}
 
 var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
 var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
@@ -46,18 +65,11 @@ d3.json("data/countries_2012.json", function (error, data) {
         };
     });
     req_data = data;
-    // column definitions
-    var columns1 = [
-        {head: 'Name', cl: 'title', html: d3.f('Name')},
-        {head: 'Continent', cl: 'center', html: d3.f('Continent')},
-        {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
-        {head: 'Life Expectancy', cl: 'num', html: d3.f('Life Expectancy', d3.format('.1f'))},
-        {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
-        {head: 'Year', cl: 'center', html: d3.f('Year', d3.format('.0f'))}
-    ];
+
     var sortAscending = true;
     // Build a table. ~Empty table~
-    var table = d3.select(".table").append("table"),
+    var table = d3.select(".table").append("table")
+            .attr("class", "fixed"),
         thead = table.append("thead")
             .attr("class", "thead");
     tbody = table.append("tbody");
@@ -129,94 +141,99 @@ d3.json("data/countries_2012.json", function (error, data) {
             .style("background-color", null);
 
     });
+    var t1 = tbody.selectAll('tr.row').selectAll('td');
 
-    function td_data(row, i) {
-        return columns1.map(function (c) {
-            // compute cell values for this specific row
-            var cell = {};
-            d3.keys(c).forEach(function (k) {
-                cell[k] = typeof c[k] == 'function' ? c[k](row, i) : c[k];
-            });
-            return cell;
-        });
+});
+
+// Set the trigger for our filtering
+d3.selectAll("input[type=checkbox]").on("change", filter_table);
+
+var update = function (new_data) {
+    // Row selection for update
+    n_rows = tbody.selectAll('tr.row').data(new_data);
+
+    n_rows.exit()
+        .transition()
+        .delay(900)
+        .duration(200)
+        .style('opacity', 0.0)
+        .remove();
+
+    n_rows = n_rows.enter()
+        .append("tr").attr("class", "row")
+        .style('opacity', 0.0)
+        .transition()
+        .delay(900)
+        .duration(500)
+        .style('opacity', 1.0)
+        .merge(n_rows);
+
+    n_cells = n_rows
+        .selectAll('td')
+        .data(td_data);
+    n_cells.exit()
+        .transition()
+        .delay(200)
+        .duration(500)
+        .style('opacity', 0.0)
+        .remove();
+    n_cells = n_cells
+        .enter()
+        .append('td')
+        .style('opacity', 0.0)
+        .transition()
+        .delay(900)
+        .duration(500)
+        .style('opacity', 1.0);
+
+    var temp = tbody.selectAll('td').data();
+    tbody.selectAll('td').html(d3.f('html'))
+        .attr('class', d3.f('cl'));
+};
+
+var update2 = function (new_data) {
+    // Row selection for update
+    var new_rows = tbody.selectAll('tr.row').data(new_data);
+    new_rows
+        .exit()
+        .remove();
+    new_rows = new_rows
+        .enter()
+        .append("tr").attr("class", "row").merge(new_rows);
+
+    var n_cells = new_rows
+        .selectAll('td')
+        .data(td_data);
+
+    n_cells.exit()
+        .remove();
+    n_cells = n_cells
+        .enter()
+        .append('td');
+
+    var temp = tbody.selectAll('td').data();
+
+    tbody.selectAll('td').html(d3.f('html'))
+        .attr('class', d3.f('cl'));
+};
+
+function filter_table() {
+    var choices = [];
+    var t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
+        var temp = d3.select(this);
+        if (temp.property("checked")) {
+            choices.push(temp.property("value"));
+        }
+    });
+    var newData;
+    if (choices.length > 0) {
+        newData = req_data.filter(function (d, i) {
+            return choices.includes(d.Continent);
+        })
     }
-
-    // Set the trigger for our filtering
-    d3.selectAll("input[type=checkbox]").on("change", filter_table);
-
-    function filter_table() {
-        var choices = [];
-        var t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
-            var temp = d3.select(this);
-            if (temp.property("checked")) {
-                choices.push(temp.property("value"));
-            }
-            ;
-        });
-        var newData;
-        if (choices.length > 0) {
-            newData = req_data.filter(function (d, i) {
-                return choices.includes(d.Continent);
-            })
-        }
-        else {
-            newData = req_data;
-        }
-        var update = function (new_data) {
-            // Row selection for update
-            n_rows = tbody.selectAll('tr.row').data(new_data);
-            n_rows.exit()
-                .transition()
-                .delay(0)
-                .duration(0)
-                .style('opacity', 0.0)
-                .remove();
-            n_rows = n_rows.enter()
-                .append("tr").attr("class", "row");
-
-            n_cells = n_rows
-                .selectAll('td')
-                .data(td_data);
-            n_cells.exit()
-                .transition()
-                .delay(0)
-                .duration(0)
-                .style('opacity', 0.0)
-                .remove();
-            n_cells = n_cells
-                .enter()
-                .append('td')
-                .html(d3.f('html'))
-                .attr('class', d3.f('cl'))
-                .merge(n_cells);
-        }
-        update(newData);
-        // tbody.selectAll("tr.row").html('');
-        // var newRows = tbody.selectAll("tr.row")
-        //     .data(newData);
-        // newRows
-        //     .enter()
-        //     .append("tr").attr("class", "row");
-        //
-        // newRows.exit().remove();
-        // rows = newRows;
-        // var cells = rows
-        //     .appendMany(td_data, 'td')
-        //     .html(d3.f('html'))
-        //     .attr('class', d3.f('cl'));
-        //
-        // var newCells = rows.data(td_data);
-        // newCells
-        //     .enter()
-        //     .append('td')
-        //     .html(d3.f('html'))
-        //     .attr('class', d3.f('cl'));
-        // newCells.exit().remove();
-        // cells = newCells;
-        // cells.appendMany(td_data, 'td')
-        //     .html(d3.f('html'))
-        //     .attr('class', d3.f('cl'));
+    else {
+        newData = req_data;
     }
-
-})
-;
+    update2(newData);
+    d3.selectAll('th').attr('class', "header");
+}
