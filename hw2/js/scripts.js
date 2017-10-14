@@ -38,6 +38,7 @@ var columns1 = [
     {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
     {head: 'Year', cl: 'center', html: d3.f('Year', d3.format('.0f'))}
 ];
+
 function td_data(row, i) {
     return columns1.map(function (c) {
         // compute cell values for this specific row
