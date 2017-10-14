@@ -5,3 +5,4 @@
 <hr>
 
 ### [Homework 1](http://alexworldd.github.io/hw1/)
+### [Homework 2](http://alexworldd.github.io/hw2/)
