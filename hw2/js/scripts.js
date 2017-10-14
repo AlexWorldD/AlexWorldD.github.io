@@ -33,7 +33,7 @@ var columns1 = [
     {head: 'Name', cl: 'title', html: d3.f('Name')},
     {head: 'Continent', cl: 'center', html: d3.f('Continent')},
     {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
-    {head: 'Life Expectancy', cl: 'num', html: d3.f('Life Expectancy', d3.format('.1f'))},
+    {head: 'Life Expectancy', cl: 'center', html: d3.f('Life Expectancy', d3.format('.1f'))},
     {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
     {head: 'Year', cl: 'center', html: d3.f('Year', d3.format('.0f'))}
 ];
@@ -67,7 +67,8 @@ d3.json("data/countries_2012.json", function (error, data) {
 
     var sortAscending = true;
     // Build a table. ~Empty table~
-    var table = d3.select(".table").append("table"),
+    var table = d3.select(".table").append("table")
+            .attr("class", "fixed"),
         thead = table.append("thead")
             .attr("class", "thead");
     tbody = table.append("tbody");
@@ -149,28 +150,43 @@ d3.selectAll("input[type=checkbox]").on("change", filter_table);
 var update = function (new_data) {
     // Row selection for update
     n_rows = tbody.selectAll('tr.row').data(new_data);
+
     n_rows.exit()
         .transition()
-        .delay(0)
-        .duration(0)
+        .delay(900)
+        .duration(200)
         .style('opacity', 0.0)
         .remove();
+
     n_rows = n_rows.enter()
-        .append("tr").attr("class", "row");
+        .append("tr").attr("class", "row")
+        .style('opacity', 0.0)
+        .transition()
+        .delay(900)
+        .duration(500)
+        .style('opacity', 1.0)
+        .merge(n_rows);
 
     n_cells = n_rows
         .selectAll('td')
         .data(td_data);
     n_cells.exit()
         .transition()
-        .delay(0)
-        .duration(0)
+        .delay(200)
+        .duration(500)
         .style('opacity', 0.0)
         .remove();
     n_cells = n_cells
         .enter()
         .append('td')
-        .html(d3.f('html'))
+        .style('opacity', 0.0)
+        .transition()
+        .delay(900)
+        .duration(500)
+        .style('opacity', 1.0);
+
+    var temp = tbody.selectAll('td').data();
+    tbody.selectAll('td').html(d3.f('html'))
         .attr('class', d3.f('cl'));
 };
 
@@ -197,7 +213,7 @@ var update2 = function (new_data) {
     var temp = tbody.selectAll('td').data();
 
     tbody.selectAll('td').html(d3.f('html'))
-        .attr('class', d3.f('cl')).merge(n_cells);
+        .attr('class', d3.f('cl'));
 };
 
 function filter_table() {
@@ -218,31 +234,5 @@ function filter_table() {
         newData = req_data;
     }
     update2(newData);
-    // tbody.selectAll("tr.row").html('');
-    // var newRows = tbody.selectAll("tr.row")
-    //     .data(newData);
-    //
-    // newRows.exit().remove();
-    // newRows
-    //     .enter()
-    //     .append("tr").attr("class", "row")
-    //     .merge(newRows);
-    // rows = newRows;
-    // var cells = rows
-    //     .appendMany(td_data, 'td')
-    //     .html(d3.f('html'))
-    //     .attr('class', d3.f('cl'));
-    //
-    // var newCells = rows.data(td_data);
-    // newCells.exit().remove();
-    // newCells
-    //     .enter()
-    //     .append('td')
-    //     .html(d3.f('html'))
-    //     .attr('class', d3.f('cl'))
-    //     .merge(newCells);
-    // cells = newCells;
-    // cells.appendMany(td_data, 'td')
-    //     .html(d3.f('html'))
-    //     .attr('class', d3.f('cl'));
+    d3.selectAll('th').attr('class', "header");
 }
