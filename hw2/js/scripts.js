@@ -294,6 +294,7 @@ function aggregate_data(data) {
         return data;
     }
 
+
 }
 
 function filter_table() {
