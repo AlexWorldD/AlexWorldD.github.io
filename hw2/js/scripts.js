@@ -86,12 +86,14 @@ function data_prepare2(data) {
             'Name': t.name,
             'Continent': t.continent,
             'Years': t.years.map(function (d) {
-                return {
+                var obj = {};
+                obj[d.year] = {
                     'GDP': d.gdp,
                     'Life Expectancy': d.life_expectancy,
-                    'Population': d.population,
-                    'Year': d.year
+                    'Population': d.population
                 }
+                return obj;
+
             })
         };
     });
@@ -100,10 +102,10 @@ function data_prepare2(data) {
 
 var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
 var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
-d3.json("data/countries_2012.json", function (error, data) {
+d3.json("data/countries_1995_2012.json", function (error, data) {
     var columns = required_columns;
     // TODO such an awful code... but should work.
-    data = data_prepare1(data)
+    data = data_prepare2(data)
     req_data = data;
 
     var sortAscending = true;
