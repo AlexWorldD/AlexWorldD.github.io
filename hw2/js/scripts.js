@@ -50,7 +50,7 @@ function td_data(row, i) {
     });
 }
 
-function make_pretty(){
+function make_pretty() {
     d3.select('tbody').selectAll("tr.row")
         .selectAll('td')
         .on("mouseover", function (d, i) {
@@ -66,12 +66,9 @@ function make_pretty(){
 
     });
 }
-var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
-var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
-d3.json("data/countries_2012.json", function (error, data) {
-    var columns = required_columns;
-    // TODO such an awful code... but should work.
-    data = data.map(function (t) {
+
+function data_prepare1(data) {
+    return data.map(function (t) {
         return {
             'Name': t.name,
             'Continent': t.continent,
@@ -81,6 +78,32 @@ d3.json("data/countries_2012.json", function (error, data) {
             'Year': t.year
         };
     });
+}
+
+function data_prepare2(data) {
+    return data.map(function (t) {
+        return {
+            'Name': t.name,
+            'Continent': t.continent,
+            'Years': t.years.map(function (d) {
+                return {
+                    'GDP': d.gdp,
+                    'Life Expectancy': d.life_expectancy,
+                    'Population': d.population,
+                    'Year': d.year
+                }
+            })
+        };
+    });
+
+}
+
+var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
+var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
+d3.json("data/countries_2012.json", function (error, data) {
+    var columns = required_columns;
+    // TODO such an awful code... but should work.
+    data = data_prepare1(data)
     req_data = data;
 
     var sortAscending = true;
@@ -222,7 +245,7 @@ var update2 = function (new_data) {
 };
 
 function filter_data(data) {
-    if (data===undefined) {
+    if (data === undefined) {
         data = req_data;
     }
     var choices = [];
@@ -246,7 +269,7 @@ function filter_data(data) {
 }
 
 function aggregate_data(data) {
-    if (data===undefined) {
+    if (data === undefined) {
         data = req_data;
     }
     var agg = d3.select('input[name="agregation"]:checked').node().value;
