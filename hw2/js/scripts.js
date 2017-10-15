@@ -218,7 +218,10 @@ var update2 = function (new_data) {
         .attr('class', d3.f('cl'));
 };
 
-function filter_table() {
+function filter_data(data) {
+    if (data===undefined) {
+        data = req_data;
+    }
     var choices = [];
     var t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
         var temp = d3.select(this);
@@ -228,13 +231,82 @@ function filter_table() {
     });
     var newData;
     if (choices.length > 0) {
-        newData = req_data.filter(function (d, i) {
+        newData = data.filter(function (d, i) {
             return choices.includes(d.Continent);
         })
     }
     else {
-        newData = req_data;
+        newData = data;
     }
-    update2(newData);
+    return newData;
+
+}
+
+function aggregate_data(data) {
+    if (data===undefined) {
+        data = req_data;
+    }
+    var agg = d3.select('input[name="agregation"]:checked').node().value;
+    var n;
+    if (agg == "byContinent") {
+        var nests = d3.nest()
+            .key(function (d) {
+                return d.Continent
+            })
+            .rollup(function (d) {
+                return {
+                    'Name': d[0].Continent,
+                    'Continent': d[0].Continent,
+                    'GDP': d3.sum(d, function (g) {
+                        return +g.GDP;
+
+                    }),
+                    'Life Expectancy': d3.mean(d, function (g) {
+                        return +g['Life Expectancy'];
+
+                    }),
+                    'Population': d3.sum(d, function (g) {
+                        return +g.Population;
+
+                    }),
+                    'Year': d[0].Year
+
+                };
+
+            })
+            .entries(data);
+        var conv = function (d) {
+            var tmp = [];
+            for (var it = 0; it < d.length; it++) {
+                tmp.push(d[it].value)
+            }
+            return tmp;
+
+        };
+        n = conv(nests);
+        return n;
+
+    }
+    else {
+        return data;
+    }
+
+}
+
+function filter_table() {
+    update2(aggregate_data(filter_data()));
+    d3.selectAll('th').attr('class', "header");
+}
+
+d3.selectAll("input[type=radio]").on("change", aggregate_table);
+
+// 'Name': t.name,
+//     'Continent': t.continent,
+//     'GDP': t.gdp,
+//     'Life Expectancy': t.life_expectancy,
+//     'Population': t.population,
+//     'Year': t.year
+function aggregate_table() {
+    update2(filter_data(aggregate_data()));
     d3.selectAll('th').attr('class', "header");
 }
