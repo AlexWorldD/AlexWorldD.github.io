@@ -97,7 +97,43 @@ function data_prepare2(data) {
             })
         };
     });
+}
+function data_prepare3(data) {
+    return data.map(function (t) {
+        return {
+            'Name': t.name,
+            'Continent': t.continent,
+            'Years': t.years.map(function (d) {
+                return {
+                    'GDP': d.gdp,
+                    'Life Expectancy': d.life_expectancy,
+                    'Population': d.population,
+                    'Year': d.year
+                }
 
+            })
+        };
+    });
+}
+
+function req_year(data, year) {
+    var y = d3.select('input[type=range]').node().valueAsNumber;
+    if (data === undefined) {
+        data = req_data;
+    }
+    if (year === undefined) {
+        year = y;
+    }
+    return data.map(function (t) {
+        return {
+            'Name': t.Name,
+            'Continent': t.Continent,
+            'GDP': t.Years[year-1995].GDP,
+            'Life Expectancy': t.Years[year-1995]['Life Expectancy'],
+            'Population': t.Years[year-1995].Population,
+            'Year': year
+        }
+    });
 }
 
 var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
@@ -105,9 +141,9 @@ var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', '
 d3.json("data/countries_1995_2012.json", function (error, data) {
     var columns = required_columns;
     // TODO such an awful code... but should work.
-    data = data_prepare2(data)
-    req_data = data;
 
+    req_data = data_prepare3(data);
+    data = req_year(req_data);
     var sortAscending = true;
     // Build a table. ~Empty table~
     var table = d3.select(".table").append("table")
@@ -248,7 +284,7 @@ var update2 = function (new_data) {
 
 function filter_data(data) {
     if (data === undefined) {
-        data = req_data;
+        data = req_year(req_data, 2008);
     }
     var choices = [];
     var t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
@@ -272,7 +308,7 @@ function filter_data(data) {
 
 function aggregate_data(data) {
     if (data === undefined) {
-        data = req_data;
+        data = req_year(req_data, 2008);
     }
     var agg = d3.select('input[name="agregation"]:checked').node().value;
     var n;
@@ -323,7 +359,7 @@ function aggregate_data(data) {
 }
 
 function filter_table() {
-    update2(aggregate_data(filter_data()));
+    update2(aggregate_data(filter_data(req_year())));
     d3.selectAll('th').attr('class', "header");
     make_pretty();
 }
@@ -337,7 +373,14 @@ d3.selectAll("input[type=radio]").on("change", aggregate_table);
 //     'Population': t.population,
 //     'Year': t.year
 function aggregate_table() {
-    update2(filter_data(aggregate_data()));
+    update2(filter_data(aggregate_data(req_year())));
+    d3.selectAll('th').attr('class', "header");
+    make_pretty();
+}
+
+d3.selectAll("input[type=range]").on("change", year_slider);
+function year_slider() {
+    update2(filter_data(aggregate_data(req_year())));
     d3.selectAll('th').attr('class', "header");
     make_pretty();
 }
