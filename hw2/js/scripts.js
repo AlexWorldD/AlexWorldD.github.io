@@ -50,6 +50,22 @@ function td_data(row, i) {
     });
 }
 
+function make_pretty(){
+    d3.select('tbody').selectAll("tr.row")
+        .selectAll('td')
+        .on("mouseover", function (d, i) {
+
+            d3.select(this.parentNode)
+                .style("background-color", "#ffb0bf");
+
+        }).on("mouseout", function () {
+        tbody.selectAll("tr")
+            .style("background-color", null)
+            .selectAll("td")
+            .style("background-color", null);
+
+    });
+}
 var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
 var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
 d3.json("data/countries_2012.json", function (error, data) {
@@ -121,27 +137,14 @@ d3.json("data/countries_2012.json", function (error, data) {
         .data(data)
         .enter()
         .append("tr").attr("class", "row");
-
     tbody.selectAll("tr.row")
         .selectAll('td')
         .data(td_data)
         .enter()
         .append('td')
         .html(d3.f('html'))
-        .attr('class', d3.f('cl'))
-        .on("mouseover", function (d, i) {
-
-            d3.select(this.parentNode)
-                .style("background-color", "#ffb0bf");
-
-        }).on("mouseout", function () {
-
-        tbody.selectAll("tr")
-            .style("background-color", null)
-            .selectAll("td")
-            .style("background-color", null);
-
-    });
+        .attr('class', d3.f('cl'));
+    make_pretty();
     var t1 = tbody.selectAll('tr.row').selectAll('td');
 
 });
@@ -291,11 +294,13 @@ function aggregate_data(data) {
         return data;
     }
 
+
 }
 
 function filter_table() {
     update2(aggregate_data(filter_data()));
     d3.selectAll('th').attr('class', "header");
+    make_pretty();
 }
 
 d3.selectAll("input[type=radio]").on("change", aggregate_table);
@@ -309,4 +314,5 @@ d3.selectAll("input[type=radio]").on("change", aggregate_table);
 function aggregate_table() {
     update2(filter_data(aggregate_data()));
     d3.selectAll('th').attr('class', "header");
+    make_pretty();
 }
