@@ -29,4 +29,8 @@ D3, with some functions such as _append_, _html_ and et. al. In memory as a `__d
                               }, ...] 
 ```
 **Question 5.1** What are the pros and cons of using HTML vs. SVG? Give some examples in the context of creating visualizations.  
-**Answer 5.1** 
+**Answer 5.1**  
+1st) SVG is vector based — good for UPScaling; in contrast, Canvas is pixel based, which is better for realistic graphics.  
+2nd) SVG objects are DOM objects and we can manipulate them using traditional JS/CSS. On the other hand, Canvas — just a graphics API, without any knowledge of data. Another con of Convas, according this pint of view, is  inability to update image — just redraw current image.  
+3rd) SVG is more _global_, cause it's HTML... and user can't _off_ HTML :) While Canvas rely on the JS, which user can _off_.  
+4th) SVG is better for front-end, due to XML structure...
