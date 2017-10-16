@@ -136,6 +136,36 @@ function req_year(data, year) {
     });
 }
 
+function sort() {
+    var h_aes = d3.select('.aes');
+    var h_des =d3.select('.des');
+        if (!h_aes.empty()) {
+            h_aes = h_aes.data()[0];
+            tbody.selectAll("tr.row").sort(function (a, b) {
+                var t = d3.ascending(a[h_aes.head], b[h_aes.head]);
+                if (t == 0 && h_aes.head == 'Continent') {
+                    return d3.ascending(a['Name'], b['Name'])
+                }
+                else return t;
+            });
+        }
+        else {
+            if (!h_des.empty()) {
+                h_des = h_des.data()[0];
+                tbody.selectAll("tr.row").sort(function (a, b) {
+                    var t = d3.descending(a[h_des.head], b[h_des.head]);
+                    if (t == 0 && h_des.head == 'Continent') {
+                        // TODO or change to des too?
+                        return d3.ascending(a['Name'], b['Name'])
+                    }
+                    else return t;
+
+                });
+            }
+            else return;
+        }
+    }
+
 var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
 var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
 d3.json("data/countries_1995_2012.json", function (error, data) {
@@ -360,7 +390,9 @@ function aggregate_data(data) {
 
 function filter_table() {
     update2(aggregate_data(filter_data(req_year())));
-    d3.selectAll('th').attr('class', "header");
+    //d3.selectAll('th').attr('class', "header");
+    sort();
+    var temp = tbody.selectAll('td').data();
     make_pretty();
 }
 
@@ -374,13 +406,15 @@ d3.selectAll("input[type=radio]").on("change", aggregate_table);
 //     'Year': t.year
 function aggregate_table() {
     update2(filter_data(aggregate_data(req_year())));
-    d3.selectAll('th').attr('class', "header");
+    sort()
+    //d3.selectAll('th').attr('class', "header");
     make_pretty();
 }
 
 d3.selectAll("input[type=range]").on("change", year_slider);
 function year_slider() {
     update2(filter_data(aggregate_data(req_year())));
-    d3.selectAll('th').attr('class', "header");
+    sort();
+    //d3.selectAll('th').attr('class', "header");
     make_pretty();
 }
