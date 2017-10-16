@@ -12,4 +12,25 @@ D3, with some functions such as _append_, _html_ and et. al. In memory as a `__d
 
 **Question 2.1:** Would you filter other columns from the table the same way? E.g. would you use checkboxes or any other HTML widget?  
 **Answer 2.1** Sure, I can, but I won't. ^_^ For instance, we can filter our table with specific range of population or life expectancy:  
-``<input type="range" id="Life" value="60">`` 
+``<input type="range" id="Life" value="60">``
+
+**Question 3.1:** Could you aggregate the table using other columns? If you think yes, explain which ones and how you would group values. Which HTML widgets would be appropriate?  
+**Answer 3.1** In my view there are _zeroreason_ for another aggregation. Meanwhile, sometimes could be helpful sub-aggregation, for example, via GDP/Population: Low, Medium and High which allows us to see the changes between different amount of $/person. For example, for High is obviously the high Life Expectancy...
+
+**Question 4.1** What does the new attribute _years_ hold?  
+**Answer 4.1** Arrays of data for specific year for selected country. 
+```sh
+"years": [
+              {
+                  "gdp": 12650000000.0,
+                  "life_expectancy": 42.0514634146341,
+                  "year": 1995,  
+                  "population": 12104952.0
+                              }, ...] 
+```
+**Question 5.1** What are the pros and cons of using HTML vs. SVG? Give some examples in the context of creating visualizations.  
+**Answer 5.1**  
+1st) SVG is vector based — good for UPScaling; in contrast, Canvas is pixel based, which is better for realistic graphics.  
+2nd) SVG objects are DOM objects and we can manipulate them using traditional JS/CSS. On the other hand, Canvas — just a graphics API, without any knowledge of data. Another con of Convas, according this pint of view, is  inability to update image — just redraw current image.  
+3rd) SVG is more _global_, cause it's HTML... and user can't _off_ HTML :) While Canvas rely on the JS, which user can _off_.  
+4th) SVG is better for front-end, due to XML structure...
