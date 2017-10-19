@@ -69,17 +69,27 @@ input[type="radio"].toggle:checked + label:after {
 /* End of header switch*/
 
 /* Multi tabs styles*/
-.bar {
+.table {
     display: none;
 }
 #bar_filter {
-    display: none;
+    display: block;
 }
+/*.bar {*/
+    /*display: none;*/
+/*}*/
+/*#bar_filter {*/
+    /*display: none;*/
+/*}*/
 h2 {
     color: black;
     margin-left: 2%;
 }
 
+.bar svg {
+    display:block;
+    margin:0 auto;
+}
 .content {
     margin-left: auto;
     margin-right: auto;

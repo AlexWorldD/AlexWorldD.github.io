@@ -1,13 +1,42 @@
-let req_data;
+function f(){
+    var functions = arguments;
 
+    //convert all string arguments into field accessors
+    var i = 0, l = functions.length;
+    while (i < l) {
+        if (typeof(functions[i]) === 'string' || typeof(functions[i]) === 'number'){
+            functions[i] = (function(str){ return function(d){ return d[str]; }; })(functions[i]);
+        }
+        i++;
+    }
+
+    //return composition of functions
+    return function(d) {
+        var i=0, l = functions.length;
+        while (i++ < l) d = functions[i-1].call(this, d);
+        return d;
+    };
+}
+
+f.not = function(d){ return !d; };
+f.run = function(d){ return d(); };
+f.objToFn = function(obj, defaultVal){
+    if (arguments.length == 1) defaultVal = undefined;
+
+    return function(str){
+        return typeof(obj[str]) !== undefined ? obj[str] : defaultVal;
+    };
+};
+
+let req_data;
 // column definitions
 const columns = [
-    {head: 'Name', cl: 'title', html: d3.f('Name')},
-    {head: 'Continent', cl: 'center', html: d3.f('Continent')},
-    {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
-    {head: 'Life Expectancy', cl: 'center', html: d3.f('Life Expectancy', d3.format('.1f'))},
-    {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
-    {head: 'Year', cl: 'center', html: d3.f('Year', d3.format('.0f'))}
+    {head: 'Name', cl: 'title', html: f('Name')},
+    {head: 'Continent', cl: 'center', html: f('Continent')},
+    {head: 'GDP', cl: 'num', html: f('GDP', d3.format('$,.2s'))},
+    {head: 'Life Expectancy', cl: 'center', html: f('Life Expectancy', d3.format('.1f'))},
+    {head: 'Population', cl: 'num', html: f('Population', d3.format(',.0f'))},
+    {head: 'Year', cl: 'center', html: f('Year', d3.format('.0f'))}
 ];
 
 function td_data(row, i) {
@@ -71,9 +100,9 @@ function req_year(data, year) {
         return {
             'Name': t.Name,
             'Continent': t.Continent,
-            'GDP': t.Years[year-1995].GDP,
-            'Life Expectancy': t.Years[year-1995]['Life Expectancy'],
-            'Population': t.Years[year-1995].Population,
+            'GDP': t.Years[year - 1995].GDP,
+            'Life Expectancy': t.Years[year - 1995]['Life Expectancy'],
+            'Population': t.Years[year - 1995].Population,
             'Year': year
         }
     });
@@ -84,37 +113,34 @@ function sort() {
     let h_aes = d3.select('.aes');
     let h_des = d3.select('.des');
     if (!h_aes.empty()) {
-            h_aes = h_aes.data()[0];
+        h_aes = h_aes.data()[0];
+        tbody.selectAll("tr.row").sort(function (a, b) {
+            const t = d3.ascending(a[h_aes.head], b[h_aes.head]);
+            if (t == 0 && h_aes.head == 'Continent') {
+                return d3.ascending(a['Name'], b['Name'])
+            }
+            else return t;
+        });
+    }
+    else {
+        if (!h_des.empty()) {
+            h_des = h_des.data()[0];
             tbody.selectAll("tr.row").sort(function (a, b) {
-                const t = d3.ascending(a[h_aes.head], b[h_aes.head]);
-                if (t == 0 && h_aes.head == 'Continent') {
+                const t = d3.descending(a[h_des.head], b[h_des.head]);
+                if (t == 0 && h_des.head == 'Continent') {
+                    // TODO or change to des too?
                     return d3.ascending(a['Name'], b['Name'])
                 }
                 else return t;
+
             });
         }
-        else {
-            if (!h_des.empty()) {
-                h_des = h_des.data()[0];
-                tbody.selectAll("tr.row").sort(function (a, b) {
-                    const t = d3.descending(a[h_des.head], b[h_des.head]);
-                    if (t == 0 && h_des.head == 'Continent') {
-                        // TODO or change to des too?
-                        return d3.ascending(a['Name'], b['Name'])
-                    }
-                    else return t;
-
-                });
-            }
-        }
     }
+}
 
-d3.json("data/countries_1995_2012.json", function (error, data) {
-
-    req_data = data_prepare(data);
-    data = req_year(req_data);
+//    Function for building TABLE
+function get_table(data) {
     let sortAscending = true;
-
     // Build a table. ~Empty table~
     const table = d3.select(".table").append("table")
             .attr("class", "fixed"),
@@ -173,10 +199,72 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
         .data(td_data)
         .enter()
         .append('td')
-        .html(d3.f('html'))
-        .attr('class', d3.f('cl'));
+        .html(f('html'))
+        .attr('class', f('cl'));
     make_pretty();
     const t1 = tbody.selectAll('tr.row').selectAll('td');
+}
+
+// Function for building BAR
+function get_bar(data) {
+    const canvas = d3.select('.bar')
+        .append('svg')
+        .attr('width', 600)
+        .attr('height', 800);
+
+    let svg = d3.select("svg"),
+        margin = {top: 10, right: 10, bottom: 20, left: 30},
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+
+    let x = d3.scaleLinear().rangeRound([0, width]);
+        y = d3.scaleBand().rangeRound([0, height]).padding(0.1);
+
+    const g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+
+    let max = d3.max(data, function (d) { return d[cur_dim]; });
+
+    y.domain(data.map(function(d) { return d.Name; }));
+    x.domain([0, d3.max(data, function(d) { return d[cur_dim]; })]);
+
+    g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+    g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y).ticks(10, "%"))
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("Frequency");
+
+    g.selectAll(".bar_chart")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar_chart")
+        .attr("x", function(d) { return x(d[cur_dim]); })
+        .attr("y", function(d) { return y(d.Name); })
+        .attr("width", function(d) { return width - y(d.Name); })
+        .attr("height", y.bandwidth());
+
+}
+
+d3.json("data/countries_1995_2012.json", function (error, data) {
+
+    req_data = data_prepare(data);
+    data = req_year(req_data);
+
+    // --------TABLE--------
+    get_table(data);
+
+    // --------BAR CHART--------
+    get_bar(data);
 
 });
 
@@ -222,8 +310,8 @@ const update = function (new_data) {
         .style('opacity', 1.0);
 
     const temp = tbody.selectAll('td').data();
-    tbody.selectAll('td').html(d3.f('html'))
-        .attr('class', d3.f('cl'));
+    tbody.selectAll('td').html(f('html'))
+        .attr('class', f('cl'));
 };
 
 const update2 = function (new_data) {
@@ -248,8 +336,8 @@ const update2 = function (new_data) {
 
     const temp = tbody.selectAll('td').data();
 
-    tbody.selectAll('td').html(d3.f('html'))
-        .attr('class', d3.f('cl'));
+    tbody.selectAll('td').html(f('html'))
+        .attr('class', f('cl'));
 };
 
 function filter_data(data) {
@@ -344,6 +432,7 @@ function aggregate_table() {
 }
 
 d3.selectAll("input[type=range]").on("change", year_slider);
+
 function year_slider() {
     update2(filter_data(aggregate_data(req_year())));
     sort();
@@ -354,8 +443,8 @@ function year_slider() {
 d3.selectAll('input[type=radio][name="toggle"]').on("change", switch_pages);
 
 function switch_pages() {
-    let cur_page  = d3.select('input[name="toggle"]:checked').node().value;
-    if (cur_page=='Table') {
+    let cur_page = d3.select('input[name="toggle"]:checked').node().value;
+    if (cur_page == 'Table') {
         d3.select('.table').style("display", "block");
         d3.select('.bar').style("display", "none");
         d3.select('#bar_filter').style("display", "none");
