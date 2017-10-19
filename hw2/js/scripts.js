@@ -340,7 +340,7 @@ function aggregate_data(data) {
     if (data === undefined) {
         data = req_year(req_data, 2008);
     }
-    const agg = d3.select('input[name="agregation"]:checked').node().value;
+    const agg = d3.select('input[name="aggregation"]:checked').node().value;
     let n;
     if (agg == "byContinent") {
         const nests = d3.nest()
@@ -396,7 +396,7 @@ function filter_table() {
     make_pretty();
 }
 
-d3.selectAll("input[type=radio]").on("change", aggregate_table);
+d3.selectAll('input[name="aggregation"]').on("change", aggregate_table);
 
 // 'Name': t.name,
 //     'Continent': t.continent,
@@ -406,7 +406,7 @@ d3.selectAll("input[type=radio]").on("change", aggregate_table);
 //     'Year': t.year
 function aggregate_table() {
     update2(filter_data(aggregate_data(req_year())));
-    sort()
+    sort();
     //d3.selectAll('th').attr('class', "header");
     make_pretty();
 }
@@ -417,4 +417,22 @@ function year_slider() {
     sort();
     //d3.selectAll('th').attr('class', "header");
     make_pretty();
+}
+
+// Table-Bar switcher
+d3.selectAll('input[type=radio][name="toggle"]').on("change", switch_pages);
+
+function switch_pages() {
+    let cur_page  = d3.select('input[name="toggle"]:checked').node().value;
+    if (cur_page=='Table') {
+        d3.select('.table').style("display", "block");
+        d3.select('.bar').style("display", "none");
+        d3.select('#bar_filter').style("display", "none");
+    }
+    else {
+        d3.select('.table').style("display", "none");
+        d3.select('.bar').style("display", "block");
+        d3.select('#bar_filter').style("display", "block");
+    }
+    let test = d3.select('.table');
 }
