@@ -1,36 +1,7 @@
-//'use strict';
-// alpha2_code
-//     :
-//     "sy"
-// continent
-//     :
-//     "Asia"
-// gdp
-//     :
-//     0
-// latitude
-//     :
-//     33.5146
-// life_expectancy
-//     :
-//     74.7107073170732
-// longitude
-//     :
-//     36.3119
-// name
-//     :
-//     "Syrian Arab Republic"
-// population
-//     :
-//     14338240
-// year
-//     :
-//     2012
-
 let req_data;
 
 // column definitions
-const columns1 = [
+const columns = [
     {head: 'Name', cl: 'title', html: d3.f('Name')},
     {head: 'Continent', cl: 'center', html: d3.f('Continent')},
     {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
@@ -40,7 +11,7 @@ const columns1 = [
 ];
 
 function td_data(row, i) {
-    return columns1.map(function (c) {
+    return columns.map(function (c) {
         // compute cell values for this specific row
         const cell = {};
         d3.keys(c).forEach(function (k) {
@@ -50,6 +21,7 @@ function td_data(row, i) {
     });
 }
 
+// Function for styling table with HOVER-actions.
 function make_pretty() {
     d3.select('tbody').selectAll("tr.row")
         .selectAll('td')
@@ -67,38 +39,8 @@ function make_pretty() {
     });
 }
 
-function data_prepare1(data) {
-    return data.map(function (t) {
-        return {
-            'Name': t.name,
-            'Continent': t.continent,
-            'GDP': t.gdp,
-            'Life Expectancy': t.life_expectancy,
-            'Population': t.population,
-            'Year': t.year
-        };
-    });
-}
-
-function data_prepare2(data) {
-    return data.map(function (t) {
-        return {
-            'Name': t.name,
-            'Continent': t.continent,
-            'Years': t.years.map(function (d) {
-                const obj = {};
-                obj[d.year] = {
-                    'GDP': d.gdp,
-                    'Life Expectancy': d.life_expectancy,
-                    'Population': d.population
-                }
-                return obj;
-
-            })
-        };
-    });
-}
-function data_prepare3(data) {
+// Function for preparing Data according natural language titles of columns
+function data_prepare(data) {
     return data.map(function (t) {
         return {
             'Name': t.name,
@@ -116,6 +58,7 @@ function data_prepare3(data) {
     });
 }
 
+// Function for getting required Year split of Data
 function req_year(data, year) {
     const y = d3.select('input[type=range]').node().valueAsNumber;
     if (data === undefined) {
@@ -136,6 +79,7 @@ function req_year(data, year) {
     });
 }
 
+// Function for styling header of table with Up/Down rows.
 function sort() {
     let h_aes = d3.select('.aes');
     let h_des = d3.select('.des');
@@ -162,19 +106,15 @@ function sort() {
 
                 });
             }
-            else return;
         }
     }
 
-const required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
-const def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
 d3.json("data/countries_1995_2012.json", function (error, data) {
-    const columns = required_columns;
-    // TODO such an awful code... but should work.
 
-    req_data = data_prepare3(data);
+    req_data = data_prepare(data);
     data = req_year(req_data);
     let sortAscending = true;
+
     // Build a table. ~Empty table~
     const table = d3.select(".table").append("table")
             .attr("class", "fixed"),
@@ -187,7 +127,7 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
 
     // Putting our data to table
     const headers = thead.append("tr").selectAll("th")
-        .data(columns1)
+        .data(columns)
         .enter()
         .append("th")
         .text(function (d) {
@@ -390,7 +330,6 @@ function aggregate_data(data) {
 
 function filter_table() {
     update2(aggregate_data(filter_data(req_year())));
-    //d3.selectAll('th').attr('class', "header");
     sort();
     const temp = tbody.selectAll('td').data();
     make_pretty();
@@ -398,16 +337,9 @@ function filter_table() {
 
 d3.selectAll('input[name="aggregation"]').on("change", aggregate_table);
 
-// 'Name': t.name,
-//     'Continent': t.continent,
-//     'GDP': t.gdp,
-//     'Life Expectancy': t.life_expectancy,
-//     'Population': t.population,
-//     'Year': t.year
 function aggregate_table() {
     update2(filter_data(aggregate_data(req_year())));
     sort();
-    //d3.selectAll('th').attr('class', "header");
     make_pretty();
 }
 
@@ -415,7 +347,6 @@ d3.selectAll("input[type=range]").on("change", year_slider);
 function year_slider() {
     update2(filter_data(aggregate_data(req_year())));
     sort();
-    //d3.selectAll('th').attr('class', "header");
     make_pretty();
 }
 
