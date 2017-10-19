@@ -27,10 +27,10 @@
 //     :
 //     2012
 
-var req_data;
+let req_data;
 
 // column definitions
-var columns1 = [
+const columns1 = [
     {head: 'Name', cl: 'title', html: d3.f('Name')},
     {head: 'Continent', cl: 'center', html: d3.f('Continent')},
     {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
@@ -42,7 +42,7 @@ var columns1 = [
 function td_data(row, i) {
     return columns1.map(function (c) {
         // compute cell values for this specific row
-        var cell = {};
+        const cell = {};
         d3.keys(c).forEach(function (k) {
             cell[k] = typeof c[k] == 'function' ? c[k](row, i) : c[k];
         });
@@ -86,7 +86,7 @@ function data_prepare2(data) {
             'Name': t.name,
             'Continent': t.continent,
             'Years': t.years.map(function (d) {
-                var obj = {};
+                const obj = {};
                 obj[d.year] = {
                     'GDP': d.gdp,
                     'Life Expectancy': d.life_expectancy,
@@ -117,7 +117,7 @@ function data_prepare3(data) {
 }
 
 function req_year(data, year) {
-    var y = d3.select('input[type=range]').node().valueAsNumber;
+    const y = d3.select('input[type=range]').node().valueAsNumber;
     if (data === undefined) {
         data = req_data;
     }
@@ -137,12 +137,12 @@ function req_year(data, year) {
 }
 
 function sort() {
-    var h_aes = d3.select('.aes');
-    var h_des =d3.select('.des');
-        if (!h_aes.empty()) {
+    let h_aes = d3.select('.aes');
+    let h_des = d3.select('.des');
+    if (!h_aes.empty()) {
             h_aes = h_aes.data()[0];
             tbody.selectAll("tr.row").sort(function (a, b) {
-                var t = d3.ascending(a[h_aes.head], b[h_aes.head]);
+                const t = d3.ascending(a[h_aes.head], b[h_aes.head]);
                 if (t == 0 && h_aes.head == 'Continent') {
                     return d3.ascending(a['Name'], b['Name'])
                 }
@@ -153,7 +153,7 @@ function sort() {
             if (!h_des.empty()) {
                 h_des = h_des.data()[0];
                 tbody.selectAll("tr.row").sort(function (a, b) {
-                    var t = d3.descending(a[h_des.head], b[h_des.head]);
+                    const t = d3.descending(a[h_des.head], b[h_des.head]);
                     if (t == 0 && h_des.head == 'Continent') {
                         // TODO or change to des too?
                         return d3.ascending(a['Name'], b['Name'])
@@ -166,17 +166,17 @@ function sort() {
         }
     }
 
-var required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
-var def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
+const required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
+const def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
 d3.json("data/countries_1995_2012.json", function (error, data) {
-    var columns = required_columns;
+    const columns = required_columns;
     // TODO such an awful code... but should work.
 
     req_data = data_prepare3(data);
     data = req_year(req_data);
-    var sortAscending = true;
+    let sortAscending = true;
     // Build a table. ~Empty table~
-    var table = d3.select(".table").append("table")
+    const table = d3.select(".table").append("table")
             .attr("class", "fixed"),
         thead = table.append("thead")
             .attr("class", "thead");
@@ -186,7 +186,7 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
         .html("World Countries Ranking");
 
     // Putting our data to table
-    var headers = thead.append("tr").selectAll("th")
+    const headers = thead.append("tr").selectAll("th")
         .data(columns1)
         .enter()
         .append("th")
@@ -200,7 +200,7 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
         if (sortAscending) {
             tbody.selectAll("tr.row").sort(function (a, b) {
                 sortAscending = false;
-                var t = d3.ascending(a[header.head], b[header.head]);
+                const t = d3.ascending(a[header.head], b[header.head]);
                 if (t == 0 && header.head == 'Continent') {
                     return d3.ascending(a['Name'], b['Name'])
                 }
@@ -211,7 +211,7 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
         else {
             tbody.selectAll("tr.row").sort(function (a, b) {
                 sortAscending = true;
-                var t = d3.descending(a[header.head], b[header.head]);
+                const t = d3.descending(a[header.head], b[header.head]);
                 if (t == 0 && header.head == 'Continent') {
                     // TODO or change to des too?
                     return d3.ascending(a['Name'], b['Name'])
@@ -236,14 +236,14 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
         .html(d3.f('html'))
         .attr('class', d3.f('cl'));
     make_pretty();
-    var t1 = tbody.selectAll('tr.row').selectAll('td');
+    const t1 = tbody.selectAll('tr.row').selectAll('td');
 
 });
 
 // Set the trigger for our filtering
 d3.selectAll("input[type=checkbox]").on("change", filter_table);
 
-var update = function (new_data) {
+const update = function (new_data) {
     // Row selection for update
     n_rows = tbody.selectAll('tr.row').data(new_data);
 
@@ -281,14 +281,14 @@ var update = function (new_data) {
         .duration(500)
         .style('opacity', 1.0);
 
-    var temp = tbody.selectAll('td').data();
+    const temp = tbody.selectAll('td').data();
     tbody.selectAll('td').html(d3.f('html'))
         .attr('class', d3.f('cl'));
 };
 
-var update2 = function (new_data) {
+const update2 = function (new_data) {
     // Row selection for update
-    var new_rows = tbody.selectAll('tr.row').data(new_data);
+    let new_rows = tbody.selectAll('tr.row').data(new_data);
     new_rows
         .exit()
         .remove();
@@ -296,7 +296,7 @@ var update2 = function (new_data) {
         .enter()
         .append("tr").attr("class", "row").merge(new_rows);
 
-    var n_cells = new_rows
+    let n_cells = new_rows
         .selectAll('td')
         .data(td_data);
 
@@ -306,7 +306,7 @@ var update2 = function (new_data) {
         .enter()
         .append('td');
 
-    var temp = tbody.selectAll('td').data();
+    const temp = tbody.selectAll('td').data();
 
     tbody.selectAll('td').html(d3.f('html'))
         .attr('class', d3.f('cl'));
@@ -316,14 +316,14 @@ function filter_data(data) {
     if (data === undefined) {
         data = req_year(req_data, 2008);
     }
-    var choices = [];
-    var t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
-        var temp = d3.select(this);
+    const choices = [];
+    const t_t = d3.selectAll("input[type=checkbox]").each(function (d) {
+        const temp = d3.select(this);
         if (temp.property("checked")) {
             choices.push(temp.property("value"));
         }
     });
-    var newData;
+    let newData;
     if (choices.length > 0) {
         newData = data.filter(function (d, i) {
             return choices.includes(d.Continent);
@@ -340,10 +340,10 @@ function aggregate_data(data) {
     if (data === undefined) {
         data = req_year(req_data, 2008);
     }
-    var agg = d3.select('input[name="agregation"]:checked').node().value;
-    var n;
+    const agg = d3.select('input[name="agregation"]:checked').node().value;
+    let n;
     if (agg == "byContinent") {
-        var nests = d3.nest()
+        const nests = d3.nest()
             .key(function (d) {
                 return d.Continent
             })
@@ -369,9 +369,9 @@ function aggregate_data(data) {
 
             })
             .entries(data);
-        var conv = function (d) {
-            var tmp = [];
-            for (var it = 0; it < d.length; it++) {
+        const conv = function (d) {
+            const tmp = [];
+            for (let it = 0; it < d.length; it++) {
                 tmp.push(d[it].value)
             }
             return tmp;
@@ -392,7 +392,7 @@ function filter_table() {
     update2(aggregate_data(filter_data(req_year())));
     //d3.selectAll('th').attr('class', "header");
     sort();
-    var temp = tbody.selectAll('td').data();
+    const temp = tbody.selectAll('td').data();
     make_pretty();
 }
 
