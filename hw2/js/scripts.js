@@ -209,15 +209,15 @@ function get_table(data) {
 function get_bar(data) {
     const canvas = d3.select('.bar')
         .append('svg')
-        .attr('width', 600)
-        .attr('height', 800);
+        .attr('width', 700)
+        .attr('height', 2800);
 
     let svg = d3.select("svg"),
-        margin = {top: 10, right: 10, bottom: 20, left: 30},
+        margin = {top: 20, right: 10, bottom: 20, left: 120},
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
 
-    let x = d3.scaleLinear().rangeRound([0, width]);
+    let x = d3.scaleLinear().range([0, width]),
         y = d3.scaleBand().rangeRound([0, height]).padding(0.1);
 
     const g = svg.append("g")
@@ -228,29 +228,30 @@ function get_bar(data) {
     let max = d3.max(data, function (d) { return d[cur_dim]; });
 
     y.domain(data.map(function(d) { return d.Name; }));
-    x.domain([0, d3.max(data, function(d) { return d[cur_dim]; })]);
+    x.domain([0, max]);
 
     g.append("g")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).ticks(5));
 
     g.append("g")
         .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y).ticks(10, "%"))
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", "0.71em")
-        .attr("text-anchor", "end")
-        .text("Frequency");
+        .call(d3.axisLeft(y).tickSize(4));
+        // .append("text")
+        // .attr("transform", "rotate(-90)")
+        // .attr("y", 0 - margin.left)
+        // .attr("x",0 - (height / 2))
+        // .attr("dy", "1em")
+        // .style("text-anchor", "middle")
+        // .text("Value");
 
     g.selectAll(".bar_chart")
         .data(data)
         .enter().append("rect")
         .attr("class", "bar_chart")
-        .attr("x", function(d) { return x(d[cur_dim]); })
+        .attr("x", function(d) { return x(0); })
         .attr("y", function(d) { return y(d.Name); })
-        .attr("width", function(d) { return width - y(d.Name); })
+        .attr("width", function(d) { return x(d[cur_dim]); })
         .attr("height", y.bandwidth());
 
 }
