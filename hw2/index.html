@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="css/styles.css?v=1.0">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans"/>
     <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="http://d3js.org/colorbrewer.v1.js"></script>
     <!--Can write the same by myself... but I'm a bit lazzzyyy-->
-    <script src="https://gka.github.io/d3-jetpack/d3v4+jetpack.js"></script>
+    <!--<script src="https://gka.github.io/d3-jetpack/d3v4+jetpack.js"></script>-->
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
     <![endif]-->
@@ -18,7 +19,13 @@
 
 <body>
 <div class="content">
-    <h1>Second Homework</h1>
+    <div class="header_group">
+        <h1>Second Homework</h1>
+        <input id="toggle-on" class="toggle toggle-left" name="toggle" value="Table" type="radio" checked>
+        <label for="toggle-on" class="btn">Table</label>
+        <input id="toggle-off" class="toggle toggle-right" name="toggle" value="Bar chart" type="radio">
+        <label for="toggle-off" class="btn">Bar chart</label>
+    </div>
     <div class="filters">
         <div class="container">
             <h3 id="filter" style="color: #1946ba">Filtering z_One:</h3>
@@ -42,12 +49,12 @@
             </div>
             <br>
             <div id="agregate">
-                <span>Agregation: </span>
+                <span>Aggregation: </span>
                 <label>
-                    <input type="radio" name="agregation" value="None" title="None"
+                    <input type="radio" name="aggregation" value="None" title="None"
                            checked> None</label>
                 <label>
-                    <input type="radio" name="agregation" value="byContinent" title="byContinent"
+                    <input type="radio" name="aggregation" value="byContinent" title="byContinent"
                     > by Continent</label>
             </div>
             <br>
@@ -57,10 +64,39 @@
                 <input type="range" min="1995" max="2012" value="2008" class="slider" step="1" id="slider">
                 <label class="years">2012</label>
             </div>
+            <br>
+            <div id="bar_filter">
+                <div id="encode_bar">
+                    <span>Encode bars by: </span>
+                    <label>
+                        <input type="radio" name="encode" value="Population" title="Population"
+                               checked> Population</label>
+                    <label>
+                        <input type="radio" name="encode" value="GDP" title="GDP"
+                        > GDP</label>
+                </div>
+                <br>
+                <div id="sort_bar">
+                    <span>Sort bars by: </span>
+                    <label>
+                        <input type="radio" name="sort" value="None" title="None"
+                               checked> None</label>
+                    <label>
+                        <input type="radio" name="sort" value="Population" title="Population"> Population</label>
+                    <label>
+                        <input type="radio" name="sort" value="GDP" title="GDP"
+                        > GDP</label>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="table">
-        <!--Table here-->
+    <div class="page_data">
+        <div class="table">
+            <!--Table here-->
+        </div>
+        <div class="bar">
+            <!--Bar here-->
+        </div>
     </div>
 </div>
 <script src="js/scripts.js"></script>

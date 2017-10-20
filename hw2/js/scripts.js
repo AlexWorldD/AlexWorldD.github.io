@@ -1,46 +1,61 @@
-//'use strict';
-// alpha2_code
-//     :
-//     "sy"
-// continent
-//     :
-//     "Asia"
-// gdp
-//     :
-//     0
-// latitude
-//     :
-//     33.5146
-// life_expectancy
-//     :
-//     74.7107073170732
-// longitude
-//     :
-//     36.3119
-// name
-//     :
-//     "Syrian Arab Republic"
-// population
-//     :
-//     14338240
-// year
-//     :
-//     2012
+function f() {
+    var functions = arguments;
+
+    //convert all string arguments into field accessors
+    var i = 0, l = functions.length;
+    while (i < l) {
+        if (typeof(functions[i]) === 'string' || typeof(functions[i]) === 'number') {
+            functions[i] = (function (str) {
+                return function (d) {
+                    return d[str];
+                };
+            })(functions[i]);
+        }
+        i++;
+    }
+
+    //return composition of functions
+    return function (d) {
+        var i = 0, l = functions.length;
+        while (i++ < l) d = functions[i - 1].call(this, d);
+        return d;
+    };
+}
+
+f.not = function (d) {
+    return !d;
+};
+f.run = function (d) {
+    return d();
+};
+f.objToFn = function (obj, defaultVal) {
+    if (arguments.length == 1) defaultVal = undefined;
+
+    return function (str) {
+        return typeof(obj[str]) !== undefined ? obj[str] : defaultVal;
+    };
+};
 
 let req_data;
-
 // column definitions
-const columns1 = [
-    {head: 'Name', cl: 'title', html: d3.f('Name')},
-    {head: 'Continent', cl: 'center', html: d3.f('Continent')},
-    {head: 'GDP', cl: 'num', html: d3.f('GDP', d3.format('$,.2s'))},
-    {head: 'Life Expectancy', cl: 'center', html: d3.f('Life Expectancy', d3.format('.1f'))},
-    {head: 'Population', cl: 'num', html: d3.f('Population', d3.format(',.0f'))},
-    {head: 'Year', cl: 'center', html: d3.f('Year', d3.format('.0f'))}
+const columns = [
+    {head: 'Name', cl: 'title', html: f('Name')},
+    {head: 'Continent', cl: 'center', html: f('Continent')},
+    {head: 'GDP', cl: 'num', html: f('GDP', d3.format('$,.2s'))},
+    {head: 'Life Expectancy', cl: 'center', html: f('Life Expectancy', d3.format('.1f'))},
+    {head: 'Population', cl: 'num', html: f('Population', d3.format(',.0f'))},
+    {head: 'Year', cl: 'center', html: f('Year', d3.format('.0f'))}
 ];
 
+const continent = ['Americas'
+    , 'Africa'
+    , 'Asia'
+    , 'Europe'
+    , 'Oceania'];
+
+const my_color=colorbrewer.Blues[5];
 function td_data(row, i) {
-    return columns1.map(function (c) {
+    return columns.map(function (c) {
         // compute cell values for this specific row
         const cell = {};
         d3.keys(c).forEach(function (k) {
@@ -50,6 +65,7 @@ function td_data(row, i) {
     });
 }
 
+// Function for styling table with HOVER-actions.
 function make_pretty() {
     d3.select('tbody').selectAll("tr.row")
         .selectAll('td')
@@ -67,38 +83,8 @@ function make_pretty() {
     });
 }
 
-function data_prepare1(data) {
-    return data.map(function (t) {
-        return {
-            'Name': t.name,
-            'Continent': t.continent,
-            'GDP': t.gdp,
-            'Life Expectancy': t.life_expectancy,
-            'Population': t.population,
-            'Year': t.year
-        };
-    });
-}
-
-function data_prepare2(data) {
-    return data.map(function (t) {
-        return {
-            'Name': t.name,
-            'Continent': t.continent,
-            'Years': t.years.map(function (d) {
-                const obj = {};
-                obj[d.year] = {
-                    'GDP': d.gdp,
-                    'Life Expectancy': d.life_expectancy,
-                    'Population': d.population
-                }
-                return obj;
-
-            })
-        };
-    });
-}
-function data_prepare3(data) {
+// Function for preparing Data according natural language titles of columns
+function data_prepare(data) {
     return data.map(function (t) {
         return {
             'Name': t.name,
@@ -116,6 +102,7 @@ function data_prepare3(data) {
     });
 }
 
+// Function for getting required Year split of Data
 function req_year(data, year) {
     const y = d3.select('input[type=range]').node().valueAsNumber;
     if (data === undefined) {
@@ -128,52 +115,46 @@ function req_year(data, year) {
         return {
             'Name': t.Name,
             'Continent': t.Continent,
-            'GDP': t.Years[year-1995].GDP,
-            'Life Expectancy': t.Years[year-1995]['Life Expectancy'],
-            'Population': t.Years[year-1995].Population,
+            'GDP': t.Years[year - 1995].GDP,
+            'Life Expectancy': t.Years[year - 1995]['Life Expectancy'],
+            'Population': t.Years[year - 1995].Population,
             'Year': year
         }
     });
 }
 
+// Function for styling header of table with Up/Down rows.
 function sort() {
     let h_aes = d3.select('.aes');
     let h_des = d3.select('.des');
     if (!h_aes.empty()) {
-            h_aes = h_aes.data()[0];
+        h_aes = h_aes.data()[0];
+        tbody.selectAll("tr.row").sort(function (a, b) {
+            const t = d3.ascending(a[h_aes.head], b[h_aes.head]);
+            if (t == 0 && h_aes.head == 'Continent') {
+                return d3.ascending(a['Name'], b['Name'])
+            }
+            else return t;
+        });
+    }
+    else {
+        if (!h_des.empty()) {
+            h_des = h_des.data()[0];
             tbody.selectAll("tr.row").sort(function (a, b) {
-                const t = d3.ascending(a[h_aes.head], b[h_aes.head]);
-                if (t == 0 && h_aes.head == 'Continent') {
+                const t = d3.descending(a[h_des.head], b[h_des.head]);
+                if (t == 0 && h_des.head == 'Continent') {
+                    // TODO or change to des too?
                     return d3.ascending(a['Name'], b['Name'])
                 }
                 else return t;
+
             });
         }
-        else {
-            if (!h_des.empty()) {
-                h_des = h_des.data()[0];
-                tbody.selectAll("tr.row").sort(function (a, b) {
-                    const t = d3.descending(a[h_des.head], b[h_des.head]);
-                    if (t == 0 && h_des.head == 'Continent') {
-                        // TODO or change to des too?
-                        return d3.ascending(a['Name'], b['Name'])
-                    }
-                    else return t;
-
-                });
-            }
-            else return;
-        }
     }
+}
 
-const required_columns = ['Name', 'Continent', 'GDP', 'Life Expectancy', 'Population', 'Year'];
-const def_titles = ['name', 'continent', 'gdp', 'life_expectancy', 'population', 'year'];
-d3.json("data/countries_1995_2012.json", function (error, data) {
-    const columns = required_columns;
-    // TODO such an awful code... but should work.
-
-    req_data = data_prepare3(data);
-    data = req_year(req_data);
+//    Function for building TABLE
+function get_table(data) {
     let sortAscending = true;
     // Build a table. ~Empty table~
     const table = d3.select(".table").append("table")
@@ -187,7 +168,7 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
 
     // Putting our data to table
     const headers = thead.append("tr").selectAll("th")
-        .data(columns1)
+        .data(columns)
         .enter()
         .append("th")
         .text(function (d) {
@@ -233,10 +214,305 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
         .data(td_data)
         .enter()
         .append('td')
-        .html(d3.f('html'))
-        .attr('class', d3.f('cl'));
+        .html(f('html'))
+        .attr('class', f('cl'));
     make_pretty();
     const t1 = tbody.selectAll('tr.row').selectAll('td');
+}
+
+// Function for building BAR
+
+function get_bar2(data) {
+    const canvas = d3.select('.bar')
+        .append('svg')
+        .attr('width', 800)
+        .attr('height', 1000);
+    // space for the labels
+    textWidth = 150;
+    barHeight = 25;
+    // Getting required encoder of bars
+    svg = d3.select("svg"),
+        margin = {top: 20, right: 10, bottom: 20, left: 20},
+        width = +svg.attr("width") - margin.left - margin.right;
+
+    height = data.length * barHeight;
+    svg.attr('height', height+25+'px');
+    d3.select(svg.node().parentNode)
+        .attr('height', (height + margin.top + margin.bottom) + 'px');
+    const g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+
+    let max = d3.max(data, function (d) {
+        return d[cur_dim];
+    });
+    // Draw X-Axis
+    xScale = d3.scaleLinear()
+        .domain([0, max])
+        .range([textWidth, width])
+        .nice();
+
+    colorScale = d3.scaleOrdinal()
+        .domain(continent)
+        .range(my_color);
+
+    // here we use an ordinal scale with scaleBand
+    // to position and size the bars in y direction
+    // https://github.com/d3/d3-scale#band-scales
+    yScale = d3.scaleBand()
+        .range([0, data.length * barHeight]).padding(.1);
+
+    // let h = data.length * barHeight;
+    let h = yScale.range()[1];
+    svg.attr('height', h+25+'px');
+    d3.select(svg.node().parentNode)
+        .attr('height', (h + margin.top + margin.bottom) + 'px');
+
+    let xAsix;
+    switch (cur_dim) {
+        case 'Population': {
+            xAxis = d3.axisBottom().ticks(5).tickFormat(d3.format(",.0f"));
+            break;
+        }
+        case 'GDP': {
+            xAxis = d3.axisBottom().ticks(7).tickFormat(d3.format(".0s"));
+            break;
+        }
+        case 'Life Expectancy': {
+            xAxis = d3.axisBottom().ticks(10).tickFormat(d3.format(".1f"));
+            break;
+        }
+    }
+    xAxis.scale(xScale);
+    svg.append("g")
+        .classed("axis", true)
+        .attr("transform", "translate(" + 0 + "," + h + ")")
+        .call(xAxis);
+
+    // ------End drawing X-Axis
+    // here we use d3's event handler
+    // https://github.com/d3/d3-selection#handling-events
+    d3.selectAll('input[type=radio][name="sort"]').on("change", function () {
+        // d3.event is set to the current event within an event listener
+        let active = d3.event.srcElement.value;
+        // sorting the array based on product, type, or tonnage
+        t = aggregate_data(filter_data(req_year()));
+        t = t.sort(function compare(a, b) {
+            if (active=="None") {
+            }
+                // fall through to type
+            else {
+                    if (a[active] > b[active])
+                        return -1;
+                    else if (a[active] < b[active])
+                        return 1;
+                    else
+                        return 0;
+            }
+        });
+        // this execute serves as the update
+        execute(t);
+    });
+    d3.selectAll('input[type=radio][name="encode"]').on("change", function () {
+        // d3.event is set to the current event within an event listener
+        let active = d3.event.srcElement.value;
+        encoder_bar();
+    });
+
+    // update_axis(data);
+    execute(data);
+
+}
+const sort_bar = function () {
+    let active = d3.select('input[name="sort"]:checked').node().value;
+    // sorting the array based on product, type, or tonnage
+    t = aggregate_data(filter_data(req_year()));
+    t = t.sort(function compare(a, b) {
+        if (active=="None") {
+
+        }
+        // fall through to type
+        else {
+            if (a[active] > b[active])
+                return -1;
+            else if (a[active] < b[active])
+                return 1;
+            else
+                return 0;
+        }
+    });
+    // this execute serves as the update
+    return t;
+}
+const encoder_bar = function (data) {
+    if (data === undefined) {
+        data = sort_bar();
+    }
+    update_axis(data);
+    // Note that execute here is also called as the update function,
+    // so everything that can be is already initialized outside of this function
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+    // here we update the yscale
+    yScale.domain(data.map(function (d) {
+        return d.Name;
+    }));
+
+    svg.selectAll(".barGroup").selectAll("rect")
+        .transition().duration(3000)
+        .attr("width", function (d) {
+            // here we call the scale function.
+            return Math.abs(xScale(d[cur_dim]) - xScale(0));
+        });
+    //barGroups = barGroupsEnter.merge(barGroups);
+
+
+};
+const execute = function (data) {
+    if (data === undefined) {
+        //data = aggregate_data(filter_data(req_year()));
+        data = sort_bar();
+    }
+    update_axis(data);
+    // Note that execute here is also called as the update function,
+    // so everything that can be is already initialized outside of this function
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+    // here we update the yscale
+    yScale.domain(data.map(function (d) {
+        return d.Name;
+    }));
+
+    let barGroups = svg.selectAll(".barGroup")
+    // here we tell D3 how to know which objects are the
+    // same thing between updates (object consistency)
+        .data(data, function (d) {
+            return d.Name;
+        });
+    let tmp = svg.selectAll(".barGroup");
+    //---------------- Exit and Exit Animations ------------------------
+
+    barGroups.exit()
+        .attr("opacity", 1)
+        .transition()
+        .duration(2000)
+        .attr("opacity", 0)
+        .remove();
+
+    //---------------- Enter and Enter Animations ------------------------
+
+    let barGroupsEnter = barGroups.enter()
+    // we package each data item into a g
+        .append("g")
+        .classed("barGroup", true)
+        // and position this g globally
+        .attr("transform", function (d) {
+            return "translate(" + 0 + "," + yScale(d.Name) + ")";
+        });
+
+    barGroupsEnter.append("text").text(function (d) {
+        return d.Name;
+    })
+        .attr("x", textWidth - 10)
+        // dy is a shift along the y axis
+        .attr("dy", yScale.step() / 2)
+        // align it to the right
+        .attr("text-anchor", "end")
+        // center it
+        .attr("alignment-baseline", "middle")
+        .attr("opacity", 0)
+        .transition().duration(2000)
+        .attr("opacity", 1);
+
+    barGroupsEnter.append("rect")
+        .attr("width", "0")
+        .attr("x", textWidth)
+        // bandwidth accesses the automatically computed width of the bar
+        .attr("height", yScale.bandwidth())
+        .style("fill", function (d) {
+            // here we apply the color scale
+            return colorScale(d.Continent);
+        })
+        .attr("width", 0)
+        .transition().duration(3000)
+        .attr("width", function (d) {
+            // here we call the scale function.
+            return Math.abs(xScale(d[cur_dim]) - xScale(0));
+        });
+    //barGroups = barGroupsEnter.merge(barGroups);
+
+    //---------------- Update Animations after sort --------------------
+
+    barGroups.transition().duration(2000)
+        .attr("transform", function (d) {
+            return "translate(" + 0 + "," + yScale(d.Name) + ")";
+        });
+    encoder_bar(data);
+};
+// TODO fix axis update
+const update_axis = function (data) {
+    if (data === undefined) {
+        data = aggregate_data(filter_data(req_year()));
+    }
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+
+    let max = 1.15*d3.max(data, function (d) {
+        return d[cur_dim];
+    });
+
+
+    xScale = d3.scaleLinear()
+        .domain([0, max])
+        .range([textWidth, width])
+        .nice();
+
+    colorScale = d3.scaleOrdinal()
+        .domain(continent)
+        .range(my_color);
+
+    // here we use an ordinal scale with scaleBand
+    // to position and size the bars in y direction
+    // https://github.com/d3/d3-scale#band-scales
+    yScale = d3.scaleBand()
+        .range([0, data.length * barHeight]).padding(.1);
+
+    // let h = data.length * barHeight;
+    let h = yScale.range()[1];
+    svg.attr('height', h+25+'px');
+    d3.select(svg.node().parentNode)
+        .attr('height', (h + margin.top + margin.bottom) + 'px');
+
+    let xAsix;
+    switch (cur_dim) {
+        case 'Population': {
+            xAxis = d3.axisBottom().ticks(5).tickFormat(d3.format(",.0f"));
+            break;
+        }
+        case 'GDP': {
+            xAxis = d3.axisBottom().ticks(7).tickFormat(d3.format(".0s"));
+            break;
+        }
+        case 'Life Expectancy': {
+            xAxis = d3.axisBottom().ticks(10).tickFormat(d3.format(".1f"));
+            break;
+        }
+    }
+    xAxis.scale(xScale);
+    svg.select('.axis')
+        .classed("axis", true).transition().duration(3000)
+        .attr("transform", "translate(" + 0 + "," + h + ")")
+        .call(xAxis);
+};
+
+d3.json("data/countries_1995_2012.json", function (error, data) {
+
+    req_data = data_prepare(data);
+    data = req_year(req_data);
+
+    // --------TABLE--------
+    get_table(data);
+
+    // --------BAR CHART--------
+    get_bar2(data);
 
 });
 
@@ -282,8 +558,8 @@ const update = function (new_data) {
         .style('opacity', 1.0);
 
     const temp = tbody.selectAll('td').data();
-    tbody.selectAll('td').html(d3.f('html'))
-        .attr('class', d3.f('cl'));
+    tbody.selectAll('td').html(f('html'))
+        .attr('class', f('cl'));
 };
 
 const update2 = function (new_data) {
@@ -308,8 +584,8 @@ const update2 = function (new_data) {
 
     const temp = tbody.selectAll('td').data();
 
-    tbody.selectAll('td').html(d3.f('html'))
-        .attr('class', d3.f('cl'));
+    tbody.selectAll('td').html(f('html'))
+        .attr('class', f('cl'));
 };
 
 function filter_data(data) {
@@ -340,7 +616,7 @@ function aggregate_data(data) {
     if (data === undefined) {
         data = req_year(req_data, 2008);
     }
-    const agg = d3.select('input[name="agregation"]:checked').node().value;
+    const agg = d3.select('input[name="aggregation"]:checked').node().value;
     let n;
     if (agg == "byContinent") {
         const nests = d3.nest()
@@ -390,31 +666,46 @@ function aggregate_data(data) {
 
 function filter_table() {
     update2(aggregate_data(filter_data(req_year())));
-    //d3.selectAll('th').attr('class', "header");
+    //update_axis();
+    execute();
     sort();
     const temp = tbody.selectAll('td').data();
     make_pretty();
 }
 
-d3.selectAll("input[type=radio]").on("change", aggregate_table);
+d3.selectAll('input[name="aggregation"]').on("change", aggregate_table);
 
-// 'Name': t.name,
-//     'Continent': t.continent,
-//     'GDP': t.gdp,
-//     'Life Expectancy': t.life_expectancy,
-//     'Population': t.population,
-//     'Year': t.year
 function aggregate_table() {
     update2(filter_data(aggregate_data(req_year())));
-    sort()
-    //d3.selectAll('th').attr('class', "header");
+    //update_axis();
+    execute();
+    sort();
     make_pretty();
 }
 
 d3.selectAll("input[type=range]").on("change", year_slider);
+
 function year_slider() {
     update2(filter_data(aggregate_data(req_year())));
+    execute();
     sort();
-    //d3.selectAll('th').attr('class', "header");
     make_pretty();
+}
+
+// Table-Bar switcher
+d3.selectAll('input[type=radio][name="toggle"]').on("change", switch_pages);
+
+function switch_pages() {
+    let cur_page = d3.select('input[name="toggle"]:checked').node().value;
+    if (cur_page == 'Table') {
+        d3.select('.table').style("display", "block");
+        d3.select('.bar').style("display", "none");
+        d3.select('#bar_filter').style("display", "none");
+    }
+    else {
+        d3.select('.table').style("display", "none");
+        d3.select('.bar').style("display", "block");
+        d3.select('#bar_filter').style("display", "block");
+    }
+    //let test = d3.select('.table');
 }
