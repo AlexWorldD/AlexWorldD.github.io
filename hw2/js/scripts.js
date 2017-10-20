@@ -350,57 +350,41 @@ function get_bar2(data) {
     // ------End drawing X-Axis
     // here we use d3's event handler
     // https://github.com/d3/d3-selection#handling-events
-    d3.selectAll('input[type=radio][name="sort"]').on("change", sort_bar(data));
+    d3.selectAll('input[type=radio][name="sort"]').on("change", function () {
+        // d3.event is set to the current event within an event listener
+        let active = d3.event.srcElement.value;
+        // sorting the array based on product, type, or tonnage
+        t = aggregate_data(filter_data(req_year()));
+        t = t.sort(function compare(a, b) {
+            if (active=="None") {
+            }
+                // fall through to type
+            else {
+                    if (a[active] > b[active])
+                        return -1;
+                    else if (a[active] < b[active])
+                        return 1;
+                    else
+                        return 0;
+            }
+        });
+        // this execute serves as the update
+        execute(t);
+    });
     d3.selectAll('input[type=radio][name="encode"]').on("change", function () {
         // d3.event is set to the current event within an event listener
         let active = d3.event.srcElement.value;
-        encoder_bar(data);
+        encoder_bar();
     });
 
     // update_axis(data);
     execute(data);
 
 }
-var sort_bar = function(data) {
-        // d3.event is set to the current event within an event listener
-        let active = d3.select('input[name="sort"]:checked').node().value;
-        // sorting the array based on product, type, or tonnage
-        data = data.sort(function compare(a, b) {
-            if (active=="None") {
-            }
-            // fall through to type
-            else {
-                if (a[active] > b[active])
-                    return -1;
-                else if (a[active] < b[active])
-                    return 1;
-                else
-                    return 0;
-            }
-        });
-        // this execute serves as the update
-        execute(data);
-};
-function updateBarChart(newData) {
-    var appending = d3.select('#bars')
-        .selectAll('rect')
-        .data(newData);
-    appending.exit().remove();
 
-    appending = appending.enter()
-        .append('rect')
-        .merge(appending)
-        .transition()
-        .duration(1000)
-        .style("fill", function(d,i){return color(d.value);})
-        .attr("y", function(d) { return y(d.value); })
-        .attr("x", function(d) { return x(d.year); })
-        .attr("height",function (d) {return height - y(d.value); })
-        .attr("width",x.bandwidth());
-}
 const encoder_bar = function (data) {
     if (data === undefined) {
-        data = req_year(req_data, 2008);
+        data = aggregate_data(filter_data(req_year()));
     }
     update_axis(data);
     // Note that execute here is also called as the update function,
@@ -412,7 +396,7 @@ const encoder_bar = function (data) {
     }));
 
     svg.selectAll(".barGroup").selectAll("rect")
-        .transition().duration(5000)
+        .transition().duration(3000)
         .attr("width", function (d) {
             // here we call the scale function.
             return Math.abs(xScale(d[cur_dim]) - xScale(0));
@@ -423,7 +407,7 @@ const encoder_bar = function (data) {
 };
 const execute = function (data) {
     if (data === undefined) {
-        data = req_year(req_data, 2008);
+        data = aggregate_data(filter_data(req_year()));
     }
     update_axis(data);
     // Note that execute here is also called as the update function,
@@ -446,7 +430,7 @@ const execute = function (data) {
     barGroups.exit()
         .attr("opacity", 1)
         .transition()
-        .duration(3000)
+        .duration(2000)
         .attr("opacity", 0)
         .remove();
 
@@ -472,7 +456,7 @@ const execute = function (data) {
         // center it
         .attr("alignment-baseline", "middle")
         .attr("opacity", 0)
-        .transition().duration(3000)
+        .transition().duration(2000)
         .attr("opacity", 1);
 
     barGroupsEnter.append("rect")
@@ -485,7 +469,7 @@ const execute = function (data) {
             return colorScale(d.Continent);
         })
         .attr("width", 0)
-        .transition().duration(5000)
+        .transition().duration(3000)
         .attr("width", function (d) {
             // here we call the scale function.
             return Math.abs(xScale(d[cur_dim]) - xScale(0));
@@ -494,16 +478,16 @@ const execute = function (data) {
 
     //---------------- Update Animations after sort --------------------
 
-    barGroups.transition().duration(3000)
+    barGroups.transition().duration(2000)
         .attr("transform", function (d) {
             return "translate(" + 0 + "," + yScale(d.Name) + ")";
         });
     encoder_bar(data);
 };
-
+// TODO fix axis update
 const update_axis = function (data) {
     if (data === undefined) {
-        data = req_year(req_data, 2008);
+        data = aggregate_data(filter_data(req_year()));
     }
     let cur_dim = d3.select('input[name="encode"]:checked').node().value;
 
@@ -718,7 +702,7 @@ function aggregate_data(data) {
 
 function filter_table() {
     update2(aggregate_data(filter_data(req_year())));
-    execute(filter_data(req_year()));
+    execute();
     sort();
     const temp = tbody.selectAll('td').data();
     make_pretty();
@@ -728,6 +712,7 @@ d3.selectAll('input[name="aggregation"]').on("change", aggregate_table);
 
 function aggregate_table() {
     update2(filter_data(aggregate_data(req_year())));
+    execute();
     sort();
     make_pretty();
 }
@@ -736,6 +721,7 @@ d3.selectAll("input[type=range]").on("change", year_slider);
 
 function year_slider() {
     update2(filter_data(aggregate_data(req_year())));
+    encoder_bar();
     sort();
     make_pretty();
 }
