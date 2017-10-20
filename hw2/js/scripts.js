@@ -409,7 +409,7 @@ const execute = function (data) {
     if (data === undefined) {
         data = aggregate_data(filter_data(req_year()));
     }
-    update_axis(data);
+    //update_axis(data);
     // Note that execute here is also called as the update function,
     // so everything that can be is already initialized outside of this function
     let cur_dim = d3.select('input[name="encode"]:checked').node().value;
@@ -491,7 +491,7 @@ const update_axis = function (data) {
     }
     let cur_dim = d3.select('input[name="encode"]:checked').node().value;
 
-    let max = d3.max(data, function (d) {
+    let max = 1.15*d3.max(data, function (d) {
         return d[cur_dim];
     });
 
@@ -702,6 +702,7 @@ function aggregate_data(data) {
 
 function filter_table() {
     update2(aggregate_data(filter_data(req_year())));
+    //update_axis();
     execute();
     sort();
     const temp = tbody.selectAll('td').data();
@@ -712,6 +713,7 @@ d3.selectAll('input[name="aggregation"]').on("change", aggregate_table);
 
 function aggregate_table() {
     update2(filter_data(aggregate_data(req_year())));
+    //update_axis();
     execute();
     sort();
     make_pretty();
@@ -721,7 +723,7 @@ d3.selectAll("input[type=range]").on("change", year_slider);
 
 function year_slider() {
     update2(filter_data(aggregate_data(req_year())));
-    encoder_bar();
+    execute();
     sort();
     make_pretty();
 }
