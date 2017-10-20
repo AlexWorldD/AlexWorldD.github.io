@@ -373,13 +373,53 @@ function get_bar2(data) {
     d3.selectAll('input[type=radio][name="encode"]').on("change", function () {
         // d3.event is set to the current event within an event listener
         let active = d3.event.srcElement.value;
-        execute(data);
+        encoder_bar(data);
     });
 
     // update_axis(data);
     execute(data);
 
 }
+function updateBarChart(newData) {
+    var appending = d3.select('#bars')
+        .selectAll('rect')
+        .data(newData);
+    appending.exit().remove();
+
+    appending = appending.enter()
+        .append('rect')
+        .merge(appending)
+        .transition()
+        .duration(1000)
+        .style("fill", function(d,i){return color(d.value);})
+        .attr("y", function(d) { return y(d.value); })
+        .attr("x", function(d) { return x(d.year); })
+        .attr("height",function (d) {return height - y(d.value); })
+        .attr("width",x.bandwidth());
+}
+const encoder_bar = function (data) {
+    if (data === undefined) {
+        data = req_year(req_data, 2008);
+    }
+    update_axis(data);
+    // Note that execute here is also called as the update function,
+    // so everything that can be is already initialized outside of this function
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+    // here we update the yscale
+    yScale.domain(data.map(function (d) {
+        return d.Name;
+    }));
+
+    svg.selectAll(".barGroup").selectAll("rect")
+        .transition().duration(5000)
+        .attr("width", function (d) {
+            // here we call the scale function.
+            return Math.abs(xScale(d[cur_dim]) - xScale(0));
+        });
+    //barGroups = barGroupsEnter.merge(barGroups);
+
+
+};
 const execute = function (data) {
     if (data === undefined) {
         data = req_year(req_data, 2008);
@@ -399,6 +439,15 @@ const execute = function (data) {
         .data(data, function (d) {
             return d.Name;
         });
+    let tmp = svg.selectAll(".barGroup");
+    //---------------- Exit and Exit Animations ------------------------
+
+    barGroups.exit()
+        .attr("opacity", 1)
+        .transition()
+        .duration(3000)
+        .attr("opacity", 0)
+        .remove();
 
     //---------------- Enter and Enter Animations ------------------------
 
@@ -440,15 +489,7 @@ const execute = function (data) {
             // here we call the scale function.
             return Math.abs(xScale(d[cur_dim]) - xScale(0));
         });
-
-    //---------------- Exit and Exit Animations ------------------------
-
-    barGroups.exit()
-        .attr("opacity", 1)
-        .transition()
-        .duration(3000)
-        .attr("opacity", 0)
-        .remove();
+    //barGroups = barGroupsEnter.merge(barGroups);
 
     //---------------- Update Animations after sort --------------------
 
@@ -456,7 +497,7 @@ const execute = function (data) {
         .attr("transform", function (d) {
             return "translate(" + 0 + "," + yScale(d.Name) + ")";
         });
-
+    encoder_bar(data);
 };
 
 const update_axis = function (data) {
