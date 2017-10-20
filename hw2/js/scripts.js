@@ -283,22 +283,21 @@ function get_bar2(data) {
     const canvas = d3.select('.bar')
         .append('svg')
         .attr('width', 800)
-        .attr('height', 2800);
-
-
+        .attr('height', 1000);
+    // space for the labels
+    textWidth = 150;
+    barHeight = 25;
     // Getting required encoder of bars
-    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
-
-    let max = d3.max(data, function (d) {
-        return d[cur_dim];
-    });
     svg = d3.select("svg"),
         margin = {top: 20, right: 10, bottom: 20, left: 20},
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom;
+        width = +svg.attr("width") - margin.left - margin.right;
+
+    height = data.length * barHeight;
+    svg.attr('height', height+25+'px');
+    d3.select(svg.node().parentNode)
+        .attr('height', (height + margin.top + margin.bottom) + 'px');
     const g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
 
     // here we use d3's event handler
     // https://github.com/d3/d3-selection#handling-events
@@ -320,7 +319,7 @@ function get_bar2(data) {
             }
         });
         // this execute serves as the update
-        execute();
+        execute(data);
     });
     d3.selectAll('input[type=radio][name="encode"]').on("change", function () {
         // d3.event is set to the current event within an event listener
@@ -328,112 +327,93 @@ function get_bar2(data) {
         update_axis(data)
     });
 
-
-    // space for the labels
-    let textWidth = 150;
-
-    let xScale = d3.scaleLinear()
-        .domain([0, max])
-        .range([textWidth, width])
-        .nice();
-
-    let colorScale = d3.scaleOrdinal()
-        .domain(continent)
-        .range(colorbrewer.Accent[5]);
-
-    // here we use an ordinal scale with scaleBand
-    // to position and size the bars in y direction
-    // https://github.com/d3/d3-scale#band-scales
-    let yScale = d3.scaleBand()
-        .range([0, height]).padding(.1);
-
-    let xAxis = d3.axisBottom().ticks(5);
-    xAxis.scale(xScale);
-
-    svg.append("g")
-        .classed("axis", true)
-        .attr("transform", "translate(" + 0 + "," + height + ")")
-        .call(xAxis);
-
-    let execute = function () {
-        // Note that execute here is also called as the update function,
-        // so everything that can be is already initialized outside of this function
-
-        // here we update the yscale
-        yScale.domain(data.map(function (d) {
-            return d.Name;
-        }));
-
-        let barGroups = svg.selectAll(".barGroup")
-        // here we tell D3 how to know which objects are the
-        // same thing between updates (object consistency)
-            .data(data, function (d) {
-                // we use the product name as the key
-                return d.Name;
-            });
-
-        //---------------- Enter and Enter Animations ------------------------
-
-        let barGroupsEnter = barGroups.enter()
-        // we package each data item into a g
-            .append("g")
-            .classed("barGroup", true)
-            // and position this g globally
-            .attr("transform", function (d) {
-                return "translate(" + 0 + "," + yScale(d.Name) + ")";
-            });
-
-        barGroupsEnter.append("text").text(function (d) {
-            return d.Name;
-        })
-            .attr("x", textWidth - 10)
-            // dy is a shift along the y axis
-            .attr("dy", yScale.step() / 2)
-            // align it to the right
-            .attr("text-anchor", "end")
-            // center it
-            .attr("alignment-baseline", "middle")
-            .attr("opacity", 0)
-            .transition().duration(3000)
-            .attr("opacity", 1);
-
-        barGroupsEnter.append("rect")
-            .attr("width", "0")
-            .attr("x", textWidth)
-            // bandwidth accesses the automatically computed width of the bar
-            .attr("height", yScale.bandwidth())
-            .style("fill", function (d) {
-                // here we apply the color scale
-                return colorScale(d.Continent);
-            })
-            .attr("width", 0)
-            .transition().duration(5000)
-            .attr("width", function (d) {
-                // here we call the scale function.
-                return Math.abs(xScale(d[cur_dim]) - xScale(0));
-            });
-
-        //---------------- Exit and Exit Animations ------------------------
-
-        barGroups.exit()
-            .attr("opacity", 1)
-            .transition()
-            .duration(3000)
-            .attr("opacity", 0)
-            .remove();
-
-        //---------------- Update Animations after sort --------------------
-
-        barGroups.transition().duration(3000)
-            .attr("transform", function (d) {
-                return "translate(" + 0 + "," + yScale(d.Name) + ")";
-            });
-    };
-    execute();
+    // update_axis(data);
+    execute(data);
 
 }
-const update_axis = function (data) {
+const execute = function (data) {
+    if (data === undefined) {
+        data = req_year(req_data, 2008);
+    }
+    update_axis(data);
+    // Note that execute here is also called as the update function,
+    // so everything that can be is already initialized outside of this function
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+    // here we update the yscale
+    yScale.domain(data.map(function (d) {
+        return d.Name;
+    }));
 
+    let barGroups = svg.selectAll(".barGroup")
+    // here we tell D3 how to know which objects are the
+    // same thing between updates (object consistency)
+        .data(data, function (d) {
+            return d.Name;
+        });
+
+    //---------------- Enter and Enter Animations ------------------------
+
+    let barGroupsEnter = barGroups.enter()
+    // we package each data item into a g
+        .append("g")
+        .classed("barGroup", true)
+        // and position this g globally
+        .attr("transform", function (d) {
+            return "translate(" + 0 + "," + yScale(d.Name) + ")";
+        });
+
+    barGroupsEnter.append("text").text(function (d) {
+        return d.Name;
+    })
+        .attr("x", textWidth - 10)
+        // dy is a shift along the y axis
+        .attr("dy", yScale.step() / 2)
+        // align it to the right
+        .attr("text-anchor", "end")
+        // center it
+        .attr("alignment-baseline", "middle")
+        .attr("opacity", 0)
+        .transition().duration(3000)
+        .attr("opacity", 1);
+
+    barGroupsEnter.append("rect")
+        .attr("width", "0")
+        .attr("x", textWidth)
+        // bandwidth accesses the automatically computed width of the bar
+        .attr("height", yScale.bandwidth())
+        .style("fill", function (d) {
+            // here we apply the color scale
+            return colorScale(d.Continent);
+        })
+        .attr("width", 0)
+        .transition().duration(5000)
+        .attr("width", function (d) {
+            // here we call the scale function.
+            return Math.abs(xScale(d[cur_dim]) - xScale(0));
+        });
+
+    //---------------- Exit and Exit Animations ------------------------
+
+    barGroups.exit()
+        .attr("opacity", 1)
+        .transition()
+        .duration(3000)
+        .attr("opacity", 0)
+        .remove();
+
+    //---------------- Update Animations after sort --------------------
+
+    barGroups.transition().duration(3000)
+        .attr("transform", function (d) {
+            return "translate(" + 0 + "," + yScale(d.Name) + ")";
+        });
+
+};
+
+const update_axis = function (data) {
+    if (data === undefined) {
+        data = req_year(req_data, 2008);
+    }
     let cur_dim = d3.select('input[name="encode"]:checked').node().value;
 
     let max = d3.max(data, function (d) {
@@ -464,23 +444,27 @@ const update_axis = function (data) {
     // });
 
 
-    // space for the labels
-    let textWidth = 150;
-
-    let xScale = d3.scaleLinear()
+    xScale = d3.scaleLinear()
         .domain([0, max])
         .range([textWidth, width])
         .nice();
 
-    let colorScale = d3.scaleOrdinal()
+    colorScale = d3.scaleOrdinal()
         .domain(continent)
         .range(colorbrewer.Accent[5]);
 
     // here we use an ordinal scale with scaleBand
     // to position and size the bars in y direction
     // https://github.com/d3/d3-scale#band-scales
-    let yScale = d3.scaleBand()
-        .range([0, height]).padding(.1);
+    yScale = d3.scaleBand()
+        .range([0, data.length * barHeight]).padding(.1);
+
+    // let h = data.length * barHeight;
+    let h = yScale.range()[1];
+    svg.attr('height', h+25+'px');
+    d3.select(svg.node().parentNode)
+        .attr('height', (h + margin.top + margin.bottom) + 'px');
+
     let xAsix;
     switch (cur_dim) {
         case 'Population': {
@@ -500,10 +484,11 @@ const update_axis = function (data) {
     svg.select('.axis').remove();
     svg.append("g")
         .classed("axis", true)
-        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .attr("transform", "translate(" + 0 + "," + h + ")")
         .call(xAxis);
 
-}
+};
+
 d3.json("data/countries_1995_2012.json", function (error, data) {
 
     req_data = data_prepare(data);
@@ -667,6 +652,7 @@ function aggregate_data(data) {
 
 function filter_table() {
     update2(aggregate_data(filter_data(req_year())));
+    execute(filter_data(req_year()));
     sort();
     const temp = tbody.selectAll('td').data();
     make_pretty();
