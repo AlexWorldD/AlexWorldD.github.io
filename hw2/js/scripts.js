@@ -47,6 +47,11 @@ const columns = [
     {head: 'Year', cl: 'center', html: f('Year', d3.format('.0f'))}
 ];
 
+const continent = ['Americas'
+    , 'Africa'
+    , 'Asia'
+    , 'Europe'
+    , 'Oceania'];
 function td_data(row, i) {
     return columns.map(function (c) {
         // compute cell values for this specific row
@@ -280,18 +285,14 @@ function get_bar2(data) {
         .attr('width', 800)
         .attr('height', 2800);
 
-    let continent = ['Americas'
-        , 'Africa'
-        , 'Asia'
-        , 'Europe'
-        , 'Oceania'];
 
+    // Getting required encoder of bars
     let cur_dim = d3.select('input[name="encode"]:checked').node().value;
 
     let max = d3.max(data, function (d) {
         return d[cur_dim];
     });
-    let svg = d3.select("svg"),
+    svg = d3.select("svg"),
         margin = {top: 20, right: 10, bottom: 20, left: 20},
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -307,7 +308,6 @@ function get_bar2(data) {
         // sorting the array based on product, type, or tonnage
         data = data.sort(function compare(a, b) {
             if (active=="None") {
-
             }
                 // fall through to type
             else {
@@ -322,6 +322,12 @@ function get_bar2(data) {
         // this execute serves as the update
         execute();
     });
+    d3.selectAll('input[type=radio][name="encode"]').on("change", function () {
+        // d3.event is set to the current event within an event listener
+        let active = d3.event.srcElement.value;
+        update_axis(data)
+    });
+
 
     // space for the labels
     let textWidth = 150;
@@ -424,12 +430,80 @@ function get_bar2(data) {
             });
     };
     execute();
-    // var button = d3.select("body").append("button");
-    // button.text("Run!");
-    // button.on("click", execute);
 
 }
+const update_axis = function (data) {
 
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+
+    let max = d3.max(data, function (d) {
+        return d[cur_dim];
+    });
+
+    // here we use d3's event handler
+    // https://github.com/d3/d3-selection#handling-events
+    // d3.selectAll('input[type=radio][name="sort"]').on("change", function () {
+    //     // d3.event is set to the current event within an event listener
+    //     let active = d3.event.srcElement.value;
+    //     // sorting the array based on product, type, or tonnage
+    //     data = data.sort(function compare(a, b) {
+    //         if (active=="None") {
+    //         }
+    //         // fall through to type
+    //         else {
+    //             if (a[active] > b[active])
+    //                 return -1;
+    //             else if (a[active] < b[active])
+    //                 return 1;
+    //             else
+    //                 return 0;
+    //         }
+    //     });
+    //     // this execute serves as the update
+    //     execute();
+    // });
+
+
+    // space for the labels
+    let textWidth = 150;
+
+    let xScale = d3.scaleLinear()
+        .domain([0, max])
+        .range([textWidth, width])
+        .nice();
+
+    let colorScale = d3.scaleOrdinal()
+        .domain(continent)
+        .range(colorbrewer.Accent[5]);
+
+    // here we use an ordinal scale with scaleBand
+    // to position and size the bars in y direction
+    // https://github.com/d3/d3-scale#band-scales
+    let yScale = d3.scaleBand()
+        .range([0, height]).padding(.1);
+    let xAsix;
+    switch (cur_dim) {
+        case 'Population': {
+            xAxis = d3.axisBottom().ticks(5).tickFormat(d3.format(",.0f"));
+            break;
+        }
+        case 'GDP': {
+            xAxis = d3.axisBottom().ticks(7).tickFormat(d3.format(".0s"));
+            break;
+        }
+        case 'Life Expectancy': {
+            xAxis = d3.axisBottom().ticks(10).tickFormat(d3.format(".1f"));
+            break;
+        }
+    }
+    xAxis.scale(xScale);
+    svg.select('.axis').remove();
+    svg.append("g")
+        .classed("axis", true)
+        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .call(xAxis);
+
+}
 d3.json("data/countries_1995_2012.json", function (error, data) {
 
     req_data = data_prepare(data);
