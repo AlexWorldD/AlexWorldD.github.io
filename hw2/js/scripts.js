@@ -409,7 +409,7 @@ const execute = function (data) {
     if (data === undefined) {
         data = aggregate_data(filter_data(req_year()));
     }
-    //update_axis(data);
+    update_axis(data);
     // Note that execute here is also called as the update function,
     // so everything that can be is already initialized outside of this function
     let cur_dim = d3.select('input[name="encode"]:checked').node().value;
