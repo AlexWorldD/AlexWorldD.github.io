@@ -1,29 +1,37 @@
-function f(){
+function f() {
     var functions = arguments;
 
     //convert all string arguments into field accessors
     var i = 0, l = functions.length;
     while (i < l) {
-        if (typeof(functions[i]) === 'string' || typeof(functions[i]) === 'number'){
-            functions[i] = (function(str){ return function(d){ return d[str]; }; })(functions[i]);
+        if (typeof(functions[i]) === 'string' || typeof(functions[i]) === 'number') {
+            functions[i] = (function (str) {
+                return function (d) {
+                    return d[str];
+                };
+            })(functions[i]);
         }
         i++;
     }
 
     //return composition of functions
-    return function(d) {
-        var i=0, l = functions.length;
-        while (i++ < l) d = functions[i-1].call(this, d);
+    return function (d) {
+        var i = 0, l = functions.length;
+        while (i++ < l) d = functions[i - 1].call(this, d);
         return d;
     };
 }
 
-f.not = function(d){ return !d; };
-f.run = function(d){ return d(); };
-f.objToFn = function(obj, defaultVal){
+f.not = function (d) {
+    return !d;
+};
+f.run = function (d) {
+    return d();
+};
+f.objToFn = function (obj, defaultVal) {
     if (arguments.length == 1) defaultVal = undefined;
 
-    return function(str){
+    return function (str) {
         return typeof(obj[str]) !== undefined ? obj[str] : defaultVal;
     };
 };
@@ -225,9 +233,13 @@ function get_bar(data) {
 
     let cur_dim = d3.select('input[name="encode"]:checked').node().value;
 
-    let max = d3.max(data, function (d) { return d[cur_dim]; });
+    let max = d3.max(data, function (d) {
+        return d[cur_dim];
+    });
 
-    y.domain(data.map(function(d) { return d.Name; }));
+    y.domain(data.map(function (d) {
+        return d.Name;
+    }));
     x.domain([0, max]);
 
     g.append("g")
@@ -237,22 +249,184 @@ function get_bar(data) {
     g.append("g")
         .attr("class", "axis axis--y")
         .call(d3.axisLeft(y).tickSize(4));
-        // .append("text")
-        // .attr("transform", "rotate(-90)")
-        // .attr("y", 0 - margin.left)
-        // .attr("x",0 - (height / 2))
-        // .attr("dy", "1em")
-        // .style("text-anchor", "middle")
-        // .text("Value");
+    // .append("text")
+    // .attr("transform", "rotate(-90)")
+    // .attr("y", 0 - margin.left)
+    // .attr("x",0 - (height / 2))
+    // .attr("dy", "1em")
+    // .style("text-anchor", "middle")
+    // .text("Value");
 
     g.selectAll(".bar_chart")
         .data(data)
         .enter().append("rect")
         .attr("class", "bar_chart")
-        .attr("x", function(d) { return x(0); })
-        .attr("y", function(d) { return y(d.Name); })
-        .attr("width", function(d) { return x(d[cur_dim]); })
+        .attr("x", function (d) {
+            return x(0);
+        })
+        .attr("y", function (d) {
+            return y(d.Name);
+        })
+        .attr("width", function (d) {
+            return x(d[cur_dim]);
+        })
         .attr("height", y.bandwidth());
+
+}
+
+function get_bar2(data) {
+    const canvas = d3.select('.bar')
+        .append('svg')
+        .attr('width', 800)
+        .attr('height', 2800);
+
+    let continent = ['Americas'
+        , 'Africa'
+        , 'Asia'
+        , 'Europe'
+        , 'Oceania'];
+
+    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
+
+    let max = d3.max(data, function (d) {
+        return d[cur_dim];
+    });
+    let svg = d3.select("svg"),
+        margin = {top: 20, right: 10, bottom: 20, left: 20},
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+    const g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+
+    // here we use d3's event handler
+    // https://github.com/d3/d3-selection#handling-events
+    d3.selectAll('input[type=radio][name="sort"]').on("change", function () {
+        // d3.event is set to the current event within an event listener
+        let active = d3.event.srcElement.value;
+        // sorting the array based on product, type, or tonnage
+        data = data.sort(function compare(a, b) {
+            if (active=="None") {
+
+            }
+                // fall through to type
+            else {
+                    if (a[active] > b[active])
+                        return -1;
+                    else if (a[active] < b[active])
+                        return 1;
+                    else
+                        return 0;
+            }
+        });
+        // this execute serves as the update
+        execute();
+    });
+
+    // space for the labels
+    let textWidth = 150;
+
+    let xScale = d3.scaleLinear()
+        .domain([0, max])
+        .range([textWidth, width])
+        .nice();
+
+    let colorScale = d3.scaleOrdinal()
+        .domain(continent)
+        .range(colorbrewer.Accent[5]);
+
+    // here we use an ordinal scale with scaleBand
+    // to position and size the bars in y direction
+    // https://github.com/d3/d3-scale#band-scales
+    let yScale = d3.scaleBand()
+        .range([0, height]).padding(.1);
+
+    let xAxis = d3.axisBottom().ticks(5);
+    xAxis.scale(xScale);
+
+    svg.append("g")
+        .classed("axis", true)
+        .attr("transform", "translate(" + 0 + "," + height + ")")
+        .call(xAxis);
+
+    let execute = function () {
+        // Note that execute here is also called as the update function,
+        // so everything that can be is already initialized outside of this function
+
+        // here we update the yscale
+        yScale.domain(data.map(function (d) {
+            return d.Name;
+        }));
+
+        let barGroups = svg.selectAll(".barGroup")
+        // here we tell D3 how to know which objects are the
+        // same thing between updates (object consistency)
+            .data(data, function (d) {
+                // we use the product name as the key
+                return d.Name;
+            });
+
+        //---------------- Enter and Enter Animations ------------------------
+
+        let barGroupsEnter = barGroups.enter()
+        // we package each data item into a g
+            .append("g")
+            .classed("barGroup", true)
+            // and position this g globally
+            .attr("transform", function (d) {
+                return "translate(" + 0 + "," + yScale(d.Name) + ")";
+            });
+
+        barGroupsEnter.append("text").text(function (d) {
+            return d.Name;
+        })
+            .attr("x", textWidth - 10)
+            // dy is a shift along the y axis
+            .attr("dy", yScale.step() / 2)
+            // align it to the right
+            .attr("text-anchor", "end")
+            // center it
+            .attr("alignment-baseline", "middle")
+            .attr("opacity", 0)
+            .transition().duration(3000)
+            .attr("opacity", 1);
+
+        barGroupsEnter.append("rect")
+            .attr("width", "0")
+            .attr("x", textWidth)
+            // bandwidth accesses the automatically computed width of the bar
+            .attr("height", yScale.bandwidth())
+            .style("fill", function (d) {
+                // here we apply the color scale
+                return colorScale(d.Continent);
+            })
+            .attr("width", 0)
+            .transition().duration(5000)
+            .attr("width", function (d) {
+                // here we call the scale function.
+                return Math.abs(xScale(d[cur_dim]) - xScale(0));
+            });
+
+        //---------------- Exit and Exit Animations ------------------------
+
+        barGroups.exit()
+            .attr("opacity", 1)
+            .transition()
+            .duration(3000)
+            .attr("opacity", 0)
+            .remove();
+
+        //---------------- Update Animations after sort --------------------
+
+        barGroups.transition().duration(3000)
+            .attr("transform", function (d) {
+                return "translate(" + 0 + "," + yScale(d.Name) + ")";
+            });
+    };
+    execute();
+    // var button = d3.select("body").append("button");
+    // button.text("Run!");
+    // button.on("click", execute);
 
 }
 
@@ -265,7 +439,7 @@ d3.json("data/countries_1995_2012.json", function (error, data) {
     get_table(data);
 
     // --------BAR CHART--------
-    get_bar(data);
+    get_bar2(data);
 
 });
 

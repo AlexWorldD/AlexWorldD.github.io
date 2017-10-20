@@ -22,7 +22,9 @@ h1 {
     text-align: center;
     transition: background 600ms ease, color 600ms ease;
 }
-
+.barGroup text {
+    font-size: 12px;
+}
 input[type="radio"].toggle {
     display: none;
 }
@@ -88,7 +90,7 @@ h2 {
 
 .bar svg {
     display:block;
-    margin:0 auto;
+    margin: 20px auto;
 }
 .content {
     margin-left: auto;
