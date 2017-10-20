@@ -350,26 +350,7 @@ function get_bar2(data) {
     // ------End drawing X-Axis
     // here we use d3's event handler
     // https://github.com/d3/d3-selection#handling-events
-    d3.selectAll('input[type=radio][name="sort"]').on("change", function () {
-        // d3.event is set to the current event within an event listener
-        let active = d3.event.srcElement.value;
-        // sorting the array based on product, type, or tonnage
-        data = data.sort(function compare(a, b) {
-            if (active=="None") {
-            }
-                // fall through to type
-            else {
-                    if (a[active] > b[active])
-                        return -1;
-                    else if (a[active] < b[active])
-                        return 1;
-                    else
-                        return 0;
-            }
-        });
-        // this execute serves as the update
-        execute(data);
-    });
+    d3.selectAll('input[type=radio][name="sort"]').on("change", sort_bar(data));
     d3.selectAll('input[type=radio][name="encode"]').on("change", function () {
         // d3.event is set to the current event within an event listener
         let active = d3.event.srcElement.value;
@@ -380,6 +361,26 @@ function get_bar2(data) {
     execute(data);
 
 }
+var sort_bar = function(data) {
+        // d3.event is set to the current event within an event listener
+        let active = d3.select('input[name="sort"]:checked').node().value;
+        // sorting the array based on product, type, or tonnage
+        data = data.sort(function compare(a, b) {
+            if (active=="None") {
+            }
+            // fall through to type
+            else {
+                if (a[active] > b[active])
+                    return -1;
+                else if (a[active] < b[active])
+                    return 1;
+                else
+                    return 0;
+            }
+        });
+        // this execute serves as the update
+        execute(data);
+};
 function updateBarChart(newData) {
     var appending = d3.select('#bars')
         .selectAll('rect')
