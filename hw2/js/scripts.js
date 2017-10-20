@@ -52,6 +52,8 @@ const continent = ['Americas'
     , 'Asia'
     , 'Europe'
     , 'Oceania'];
+
+const my_color=colorbrewer.Blues[5];
 function td_data(row, i) {
     return columns.map(function (c) {
         // compute cell values for this specific row
@@ -219,65 +221,6 @@ function get_table(data) {
 }
 
 // Function for building BAR
-function get_bar(data) {
-    const canvas = d3.select('.bar')
-        .append('svg')
-        .attr('width', 700)
-        .attr('height', 2800);
-
-    let svg = d3.select("svg"),
-        margin = {top: 20, right: 10, bottom: 20, left: 120},
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom;
-
-    let x = d3.scaleLinear().range([0, width]),
-        y = d3.scaleBand().rangeRound([0, height]).padding(0.1);
-
-    const g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    let cur_dim = d3.select('input[name="encode"]:checked').node().value;
-
-    let max = d3.max(data, function (d) {
-        return d[cur_dim];
-    });
-
-    y.domain(data.map(function (d) {
-        return d.Name;
-    }));
-    x.domain([0, max]);
-
-    g.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).ticks(5));
-
-    g.append("g")
-        .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y).tickSize(4));
-    // .append("text")
-    // .attr("transform", "rotate(-90)")
-    // .attr("y", 0 - margin.left)
-    // .attr("x",0 - (height / 2))
-    // .attr("dy", "1em")
-    // .style("text-anchor", "middle")
-    // .text("Value");
-
-    g.selectAll(".bar_chart")
-        .data(data)
-        .enter().append("rect")
-        .attr("class", "bar_chart")
-        .attr("x", function (d) {
-            return x(0);
-        })
-        .attr("y", function (d) {
-            return y(d.Name);
-        })
-        .attr("width", function (d) {
-            return x(d[cur_dim]);
-        })
-        .attr("height", y.bandwidth());
-
-}
 
 function get_bar2(data) {
     const canvas = d3.select('.bar')
@@ -312,7 +255,7 @@ function get_bar2(data) {
 
     colorScale = d3.scaleOrdinal()
         .domain(continent)
-        .range(colorbrewer.Accent[5]);
+        .range(my_color);
 
     // here we use an ordinal scale with scaleBand
     // to position and size the bars in y direction
@@ -524,7 +467,7 @@ const update_axis = function (data) {
 
     colorScale = d3.scaleOrdinal()
         .domain(continent)
-        .range(colorbrewer.Accent[5]);
+        .range(my_color);
 
     // here we use an ordinal scale with scaleBand
     // to position and size the bars in y direction
@@ -764,5 +707,5 @@ function switch_pages() {
         d3.select('.bar').style("display", "block");
         d3.select('#bar_filter').style("display", "block");
     }
-    let test = d3.select('.table');
+    //let test = d3.select('.table');
 }

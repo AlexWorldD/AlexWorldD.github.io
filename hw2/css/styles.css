@@ -71,18 +71,18 @@ input[type="radio"].toggle:checked + label:after {
 /* End of header switch*/
 
 /* Multi tabs styles*/
-.table {
-    display: none;
-}
-#bar_filter {
-    display: block;
-}
-/*.bar {*/
+/*.table {*/
     /*display: none;*/
 /*}*/
 /*#bar_filter {*/
-    /*display: none;*/
+    /*display: block;*/
 /*}*/
+.bar {
+    display: none;
+}
+#bar_filter {
+    display: none;
+}
 h2 {
     color: black;
     margin-left: 2%;
