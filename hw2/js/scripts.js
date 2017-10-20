@@ -381,10 +381,30 @@ function get_bar2(data) {
     execute(data);
 
 }
+const sort_bar = function () {
+    let active = d3.select('input[name="sort"]:checked').node().value;
+    // sorting the array based on product, type, or tonnage
+    t = aggregate_data(filter_data(req_year()));
+    t = t.sort(function compare(a, b) {
+        if (active=="None") {
 
+        }
+        // fall through to type
+        else {
+            if (a[active] > b[active])
+                return -1;
+            else if (a[active] < b[active])
+                return 1;
+            else
+                return 0;
+        }
+    });
+    // this execute serves as the update
+    return t;
+}
 const encoder_bar = function (data) {
     if (data === undefined) {
-        data = aggregate_data(filter_data(req_year()));
+        data = sort_bar();
     }
     update_axis(data);
     // Note that execute here is also called as the update function,
@@ -407,7 +427,8 @@ const encoder_bar = function (data) {
 };
 const execute = function (data) {
     if (data === undefined) {
-        data = aggregate_data(filter_data(req_year()));
+        //data = aggregate_data(filter_data(req_year()));
+        data = sort_bar();
     }
     update_axis(data);
     // Note that execute here is also called as the update function,
