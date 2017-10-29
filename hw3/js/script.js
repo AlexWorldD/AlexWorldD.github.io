@@ -1,4 +1,4 @@
-
+const my_color=colorbrewer.Blues[5];
 // Load CSV file
 d3.csv("data/fifa-world-cup.csv", function (error, allData) {
     allData.forEach(function (d) {
