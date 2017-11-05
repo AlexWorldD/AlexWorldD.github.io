@@ -116,8 +116,9 @@ class BarChart {
         d3.selectAll('rect.bar').on("click", this.selectCup);
         this.xScale = xScale;
         this.yScale = yScale;
-
-
+        let rnd = Math.floor(Math.random() * this.allData.length);
+        let t = d3.selectAll('rect.bar');
+        // t.classed('selected', true)
         // ******* TODO: PART II *******
 
         // Implement how the bars respond to click events
@@ -175,7 +176,7 @@ class BarChart {
 
         //---------------- Update height of bars + Animations ------------------------
         d3.select('#bars').selectAll('rect.bar')
-            .attr('class', 'bar')
+            // .attr('class', 'bar')
             .transition().duration(2000)
             .attr('y', function (d) {
                 return yScale(d[selectedDimension]);
@@ -200,6 +201,10 @@ class BarChart {
         // menu item from the drop down.
     }
     selectCup(cur) {
+        // Del previous selection
+        d3.selectAll('.selected').classed('selected', false);
         barChart.infoPanel.updateInfo(cur);
+        d3.select(this)
+            .classed('selected', true)
     }
 }

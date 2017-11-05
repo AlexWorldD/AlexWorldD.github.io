@@ -36,9 +36,5 @@ class InfoPanel {
             })
             // .transition().duration(500)
             // .style('opacity', 1.0);
-
-
-
-        //Set Labels
     }
 }
