@@ -33,7 +33,7 @@ d3.csv("data/fifa-world-cup.csv", function (error, allData) {
     window.barChart = new BarChart(worldMap, infoPanel, allData.reverse());
 
     // Draw the Bar chart for the first time
-    barChart.updateBarChart('attendance');
+    // barChart.updateBarChart('attendance');
 });
 
 /**
@@ -46,5 +46,6 @@ function chooseData() {
     // ******* TODO: PART I *******
     // Changed the selected data when a user selects a different
     // menu item from the drop down.
+    barChart.update();
 
 }
