@@ -93,9 +93,23 @@ class BarChart {
             .attr("transform", "rotate(-90)" );
 
 
+        // Color scaling
+        let colorScale = d3.scaleSequential(d3['interpolateBlues'])
+            .domain([0, max])
+
+        var bars = d3.select('#bars').selectAll('rect.bar')
+            .data(this.allData)
+            .enter().append('rect')
+            .attr('class', 'bar')
+            .attr('x', function(d){ return (margin.left + xScale(d.year));})
+            .attr('width', xScale.bandwidth())
+            .attr('y', function(d){ return yScale(d[selectedDimension]); })
+            .attr('height', 0)
+            .transition().duration(2000)
+            .attr('height', function(d){ return height-margin.top-margin.bottom - yScale(d[selectedDimension]); })
+            .style('fill', function(d){ return colorScale(d[selectedDimension])})
+
         return;
-
-
         let barGroups = svg.selectAll('.barsGroup')
         // here we tell D3 how to know which objects are the
         // same thing between updates (object consistency)
