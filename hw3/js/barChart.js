@@ -42,7 +42,7 @@ class BarChart {
         // Draw Y-Axis
         let yScale = d3.scaleLinear()
             .domain([0, max])
-            .range([height - (margin.bottom + margin.top), 0 + margin.top])
+            .range([height - (margin.bottom + margin.top), margin.top])
             .nice();
         let yAxis = d3.axisLeft();
         switch (selectedDimension) {
@@ -203,8 +203,10 @@ class BarChart {
     selectCup(cur) {
         // Del previous selection
         d3.selectAll('.selected').classed('selected', false);
-        barChart.infoPanel.updateInfo(cur);
         d3.select(this)
             .classed('selected', true)
+        infoPanel.updateInfo(cur);
+        worldMap.updateMap(cur);
+
     }
 }
