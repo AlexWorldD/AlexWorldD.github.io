@@ -4,7 +4,6 @@ d3.csv("data/fifa-world-cup.csv", function (error, allData) {
     allData.forEach(function (d) {
         // Convert numeric values to 'numbers'
         d.year = +d.YEAR;
-        d.teams = +d.TEAMS;
         d.matches = +d.MATCHES;
         d.goals = +d.GOALS;
         d.avg_goals = +d.AVERAGE_GOALS;
@@ -16,6 +15,7 @@ d3.csv("data/fifa-world-cup.csv", function (error, allData) {
         //Break up lists into javascript arrays
         d.teams_iso = d3.csvParse(d.TEAM_LIST).columns;
         d.teams_names = d3.csvParse(d.TEAM_NAMES).columns;
+        d.teams = +d.teams_names.length;
     });
 
     /* Create infoPanel, barChart and Map objects  */

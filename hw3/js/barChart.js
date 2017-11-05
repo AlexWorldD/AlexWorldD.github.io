@@ -17,7 +17,7 @@ class BarChart {
     }
 
     drawBarChart(selectedDimension) {
-
+        // ******* TODO: PART I *******
         if (selectedDimension === undefined) {
             selectedDimension = d3.select('#dataset').property("value");
         }
@@ -113,20 +113,9 @@ class BarChart {
             .style('fill', function (d) {
                 return colorScale(d[selectedDimension])
             });
+        d3.selectAll('rect.bar').on("click", this.selectCup);
         this.xScale = xScale;
         this.yScale = yScale;
-
-        // ******* TODO: PART I *******
-
-
-        // Create the x and y scales; make
-        // sure to leave room for the axes
-
-        // Create colorScale
-
-        // Create the axes (hint: use #xAxis and #yAxis)
-
-        // Create the bars (hint: use #bars)
 
 
         // ******* TODO: PART II *******
@@ -209,6 +198,8 @@ class BarChart {
         // ******* TODO: PART I *******
         //Changed the selected data when a user selects a different
         // menu item from the drop down.
-
+    }
+    selectCup(cur) {
+        barChart.infoPanel.updateInfo(cur);
     }
 }
