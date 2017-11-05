@@ -1,10 +1,9 @@
-
+const my_color=colorbrewer.Blues[5];
 // Load CSV file
 d3.csv("data/fifa-world-cup.csv", function (error, allData) {
     allData.forEach(function (d) {
         // Convert numeric values to 'numbers'
         d.year = +d.YEAR;
-        d.teams = +d.TEAMS;
         d.matches = +d.MATCHES;
         d.goals = +d.GOALS;
         d.avg_goals = +d.AVERAGE_GOALS;
@@ -16,11 +15,12 @@ d3.csv("data/fifa-world-cup.csv", function (error, allData) {
         //Break up lists into javascript arrays
         d.teams_iso = d3.csvParse(d.TEAM_LIST).columns;
         d.teams_names = d3.csvParse(d.TEAM_NAMES).columns;
+        d.teams = +d.teams_names.length;
     });
 
     /* Create infoPanel, barChart and Map objects  */
-    let infoPanel = new InfoPanel();
-    let worldMap = new Map();
+    window.infoPanel = new InfoPanel();
+    window.worldMap = new Map();
 
     /* DATA LOADING */
     //Load in json data to make map
@@ -30,10 +30,10 @@ d3.csv("data/fifa-world-cup.csv", function (error, allData) {
     });
 
     // Define this as a global variable
-    window.barChart = new BarChart(worldMap, infoPanel, allData);
+    window.barChart = new BarChart(worldMap, infoPanel, allData.reverse());
 
     // Draw the Bar chart for the first time
-    barChart.updateBarChart('attendance');
+    // barChart.updateBarChart('attendance');
 });
 
 /**
@@ -46,5 +46,6 @@ function chooseData() {
     // ******* TODO: PART I *******
     // Changed the selected data when a user selects a different
     // menu item from the drop down.
+    barChart.update();
 
 }

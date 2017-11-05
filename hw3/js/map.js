@@ -5,22 +5,19 @@ class Map {
      */
     constructor() {
         this.projection = d3.geoConicConformal().scale(150).translate([400, 350]);
-
+        this.map = d3.select('#map');
+        this.points = d3.select('#points');
     }
 
     /**
      * Function that clears the map
      */
     clearMap() {
-
-        // ******* TODO: PART V*******
-        // Clear the map of any colors/markers; You can do this with inline styling or by
-        // defining a class style in styles.css
-
-        // Hint: If you followed our suggestion of using classes to style
-        // the colors and markers for hosts/teams/winners, you can use
-        // d3 selection and .classed to set these classes on and off here.
-
+        this.map.selectAll('.countries')
+            .classed('countries', true)
+            .classed('host', false)
+            .classed('team', false);
+        this.points.html('');
     }
 
     /**
@@ -29,26 +26,44 @@ class Map {
      */
     updateMap(worldcupData) {
 
-        //Clear any previous selections;
+        // Clear any previous selections;
         this.clearMap();
-
-        // ******* TODO: PART V *******
-
+        let projection = this.projection;
+        // Update classes for required World Cup
+        let teams = worldcupData.teams_iso;
+        for (let cur in teams) {
+            this.map.select('#' + teams[cur])
+                .classed('team', true);
+        }
+        this.map.select('#' + worldcupData.host_country_code)
+            .classed('host', true);
         // Add a marker for the winner and runner up to the map.
 
         // Hint: remember we have a conveniently labeled class called .winner
         // as well as a .silver. These have styling attributes for the two
         // markers.
-
-
-        // Select the host country and change it's color accordingly.
-
-        // Iterate through all participating teams and change their color as well.
-
-        // We strongly suggest using CSS classes to style the selected countries.
-
-
-        // Add a marker for gold/silver medalists
+        let winner = [worldcupData.WIN_LON, worldcupData.WIN_LAT];
+        let silver = [worldcupData.RUP_LON, worldcupData.RUP_LAT];
+        this.points
+            .append('circle')
+            .attr('cx', function (d) {
+                return projection(winner)[0];
+            })
+            .attr('cy', function (d) {
+                return projection(winner)[1];
+            })
+            .attr('r', '10px')
+            .attr('class', 'gold');
+        this.points
+            .append('circle')
+            .attr('cx', function (d) {
+                return projection(silver)[0];
+            })
+            .attr('cy', function (d) {
+                return projection(silver)[1];
+            })
+            .attr('r', '8px')
+            .attr('class', 'silver');
     }
 
     /**
@@ -57,20 +72,24 @@ class Map {
      */
     drawMap(world) {
 
-        //(note that projection is a class member
-        // updateMap() will need it to add the winner/runner_up markers.)
-
-        // ******* TODO: PART IV *******
-
-        // Draw the background (country outlines; hint: use #map)
-        // Make sure and add gridlines to the map
-
-        // Hint: assign an id to each country path to make it easier to select afterwards
-        // we suggest you use the variable in the data element's .id field to set the id
-
-        // Make sure and give your paths the appropriate class (see the .css selectors at
-        // the top of the provided html file)
-
+        // First of all create var with converter from GEOJson to string for svg
+        let path = d3.geoPath()
+            .projection(this.projection);
+        let countries = topojson.feature(world, world.objects.countries).features;
+        this.map.selectAll('path')
+            .data(countries)
+            .enter()
+            .append('path')
+            .classed('countries', true)
+            .attr('id', function (d) {
+                return d.id;
+            })
+            .attr('d', path);
+        this.map
+            .append('path')
+            .datum(d3.geoGraticule().stepMinor([13, 13]))
+            .attr('class', 'graticule')
+            .attr('d', path);
     }
 
 

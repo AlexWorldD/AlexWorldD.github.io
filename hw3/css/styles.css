@@ -35,24 +35,28 @@
 }
 
 .selected {
-    fill: #d20a11;
+    fill: #d20a11 !important;
 }
 
 /*Map grid style*/
-.grat {
+.graticule {
     stroke: grey;
     stroke-width: 1px;
     opacity: .2;
+    fill: none;
+    stroke-opacity: .3;
+    stroke-dasharray: 3, 1;
+    /*z-index: -1;*/
 }
 
 @font-face {
     font-family: 'font2';
-    src: url('assets/font2.ttf');
+    src: url('../assets/font2.ttf');
 }
 
 @font-face {
     font-family: 'font1';
-    src: url('assets/font1.ttf');
+    src: url('../assets/font1.ttf');
 }
 
 h1 {

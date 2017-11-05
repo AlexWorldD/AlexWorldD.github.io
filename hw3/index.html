@@ -2,15 +2,22 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Visualization - Homework 3</title>
-    <link rel="stylesheet" href="styles.css"/>
+    <meta charset="utf-8">
+    <title>Homework #3</title>
+    <meta name="description" content="HW2">
+    <meta name="author" content="iLex">
+    <link rel="stylesheet" href="css/styles.css"/>
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    <script src="https://d3js.org/colorbrewer.v1.js"></script>
+    <script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
     <script src="js/infoPanel.js" async></script>
     <script src="js/barChart.js" async></script>
     <script src="js/map.js" async></script>
     <script src="js/script.js" async></script>
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+    <![endif]-->
 </head>
 
 <body>
@@ -66,7 +73,7 @@
         </svg>
 
         <svg width="900" height="600">
-            <g id="map">            </g>
+            <g id="map" width="900" height="600"></g>
             <g id="points"></g>
         </svg>
     </div>
