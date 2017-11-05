@@ -36,46 +36,65 @@ class BarChart {
         // Getting required encoder of bars
         let svg = d3.select('#barChart'),
             padding = {top: 20, right: 10, bottom: 20, left: 20},
+            margin = {top: 10, right: 5, bottom: 40, left: 60},
             height = +svg.attr("height"),
             width = +svg.attr("width");
         //svg.attr('height', height+25+'px');
-        d3.select(svg.node().parentNode)
-            .attr('width', (width + padding.left + padding.right) + 'px')
-            .attr('height', (height + padding.top + padding.bottom) + 'px');
+        // d3.select(svg.node().parentNode)
+        //     .attr('width', (width + padding.left + padding.right) + 'px')
+        //     .attr('height', (height + padding.top + padding.bottom) + 'px');
 
-        // Draw X-Axis
+        // Draw Y-Axis
         let yScale = d3.scaleLinear()
             .domain([0, max])
-            .range([0, height])
+            .range([height-(margin.bottom+margin.top), 0+margin.top])
             .nice();
-
-        let xScale = d3.scaleBand()
-            .range([0, width]).padding(.1);
-        let w = xScale.range()[1];
-
-        let yAxis;
+        let yAxis = d3.axisLeft();
         switch (selectedDimension) {
             case 'attendance': {
-                yAxis = d3.axisBottom().ticks(10).tickFormat(d3.format(",.0f"));
+                yAxis.ticks(10).tickFormat(d3.format(",.0f"));
                 break;
             }
             case 'teams': {
-                yAxis = d3.axisBottom().ticks(7).tickFormat(d3.format(".0f"));
+                yAxis.ticks(7).tickFormat(d3.format(".0f"));
                 break;
             }
             case 'goals': {
-                yAxis = d3.axisBottom().ticks(10).tickFormat(d3.format(".0f"));
+                yAxis.ticks(10).tickFormat(d3.format(".0f"));
                 break;
             }
             case 'matches': {
-                yAxis = d3.axisBottom().ticks(7).tickFormat(d3.format(".0f"));
+                yAxis.ticks(7).tickFormat(d3.format(".0f"));
                 break;
             }
         }
         yAxis.scale(yScale);
+
+        // Draw X-Axis
+        let xScale = d3.scaleBand()
+            .range([0, width-margin.left-margin.right]).padding(.1)
+        // Setting the domain for X scale: from first to last year
+            .domain(this.allData.map(function (d) { return d.YEAR}));
+        let xAxis = d3.axisBottom(xScale)
+
+        let w = xScale.range()[1];
+
         d3.select('#yAxis')
-            .attr("transform", "translate(" + 0 + "," + w + ")")
+            .attr("transform", "translate("+ margin.left + ',' + 0 + ")")
             .call(yAxis);
+
+        svg.select('#xAxis')
+            .attr('transform', 'translate(' + margin.left + ',' + (height-margin.top-margin.bottom) + ')')
+            .call(xAxis)
+            .selectAll('text')
+            .style("text-anchor", "end")
+            .attr("dx", "-15px")
+            .attr("dy", "-5px")
+            .attr("transform", "rotate(-90)" );
+
+
+        return;
+
 
         let barGroups = svg.selectAll('.barsGroup')
         // here we tell D3 how to know which objects are the
@@ -106,9 +125,9 @@ class BarChart {
         barGroupsEnter.append("text").text(function (d) {
             return d.YEAR;
         })
-            .attr("x", textWidth - 10)
+            .attr("x", function(d) { return xScale(d.YEAR)})
             // dy is a shift along the y axis
-            .attr("dy", xScale.step() / 2)
+            .attr("dx", xScale.step() / 2)
             // align it to the right
             .attr("text-anchor", "end")
             // center it
