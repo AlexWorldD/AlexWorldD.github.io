@@ -103,9 +103,10 @@ class BarChart {
             .attr('class', 'bar')
             .attr('x', function(d){ return (margin.left + xScale(d.year));})
             .attr('width', xScale.bandwidth())
-            .attr('y', function(d){ return yScale(d[selectedDimension]); })
+            .attr("y", height-margin.top-margin.bottom) //setting y at the bottom for the transition effect
             .attr('height', 0)
-            .transition().duration(2000)
+            .transition().duration(3000)
+            .attr('y', function(d){ return yScale(d[selectedDimension]); })
             .attr('height', function(d){ return height-margin.top-margin.bottom - yScale(d[selectedDimension]); })
             .style('fill', function(d){ return colorScale(d[selectedDimension])})
 
