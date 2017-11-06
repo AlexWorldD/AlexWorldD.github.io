@@ -2,10 +2,10 @@
 class InfoPanel {
     constructor() {
         let details = d3.select('#details');
-        this.edition = details.select('h2#edition');
-        this.host = details.select('#host');
-        this.winner = details.select('#winner');
-        this.silver = details.select('#silver');
+        this.edition = details.select('h2#edition').classed('for_tip', true);
+        this.host = details.select('#host').classed('for_tip', true);
+        this.winner = details.select('#winner').classed('for_tip', true);
+        this.silver = details.select('#silver').classed('for_tip', true);
         this.teams = details.select('#teams');
     }
 
@@ -25,6 +25,10 @@ class InfoPanel {
         let cur_list = this.teams;
         cur_list.selectAll('ul')
             .remove();
+
+        // let div = d3.select("body").append("div")
+        //     .attr("class", "tooltip")
+        //     .style("opacity", 0);
         // Add new list
         // `TODO: update to d3.enter and d3.exit if it's possible
         cur_list.append('ul').selectAll('li').data(countries)
@@ -34,7 +38,11 @@ class InfoPanel {
             .text(function (d) {
                 return d;
             })
-            // .transition().duration(500)
-            // .style('opacity', 1.0);
+            .on('click', tip);
+        // let test  = d3.select('#details').select('#host')
+        // .transition().duration(500)
+        // .style('opacity', 1.0);
+
+        //10% extra credit: make all the countries respond to a click event by displaying a list of World Cups they participated in. Also display if they were ever winners or runner ups. Add this information to a new, separate panel.
     }
 }

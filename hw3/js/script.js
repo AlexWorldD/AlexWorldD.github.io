@@ -1,4 +1,4 @@
-const my_color=colorbrewer.Blues[5];
+const my_color = colorbrewer.Blues[5];
 // Load CSV file
 d3.csv("data/fifa-world-cup.csv", function (error, allData) {
     allData.forEach(function (d) {
@@ -17,7 +17,7 @@ d3.csv("data/fifa-world-cup.csv", function (error, allData) {
         d.teams_names = d3.csvParse(d.TEAM_NAMES).columns;
         d.teams = +d.teams_names.length;
     });
-
+    window.allData = allData.reverse();
     /* Create infoPanel, barChart and Map objects  */
     window.infoPanel = new InfoPanel();
     window.worldMap = new Map();
@@ -33,7 +33,7 @@ d3.csv("data/fifa-world-cup.csv", function (error, allData) {
         window.worldMap.drawMap(world);
     });
     // Define this as a global variable
-    window.barChart = new BarChart(allData.reverse());
+    window.barChart = new BarChart();
 
     // Draw the Bar chart for the first time
     // barChart.updateBarChart('attendance');
@@ -52,3 +52,71 @@ function chooseData() {
     window.barChart.update();
 
 }
+// var tip = d3.tip()
+//     .attr('class', 'd3-tip')
+//     // .offset([-10, 0])
+//     .html(function(d) {
+//         let result = getInfo(d);
+//         let gold = "<circle class=\"gold\" r=\"6\"></circle>";
+//         let silver = "<circle class=\"silver\" r=\"5\" ></circle>";
+//         let res_html = "<ul>";
+//         for (let cur in result.winner) {
+//             res_html+="<li>"+cur+gold+"</li>"
+//
+//         }
+//     });
+function getInfo(cur) {
+    let result = {
+        'winner': new Array(),
+        'silver': new Array(),
+        'part': new Array()
+    };
+    for (let it=0; it<window.allData.length; it++) {
+        let d = window.allData[it];
+        if (d.teams_names.includes(cur)) {
+            if (d.winner == cur) {
+                result.winner.push(d.EDITION);
+            }
+            if (d.runner_up==cur) {
+                result.silver.push(d.EDITION)
+            }
+            else {
+                result.part.push(d.EDITION)
+            }
+
+        }
+
+    }
+    let gold = "<svg width=\"10\" height=\"10\"><circle class=\"gold\" cx=\"5\" cy=\"5\" r=\"4\"></circle></svg>";
+    let silver = "<svg width=\"10\" height=\"10\"><circle class=\"silver\" cx=\"5\" cy=\"5\" r=\"4\"></circle></svg>";
+    let blank = "<svg width=\"10\" height=\"10\"></svg>";
+    let res_html = "<ul id=\"tip\">";
+    for (let cur in result.winner) {
+        res_html += "<li>" + gold + result.winner[cur] +  "</li>"
+    }
+    for (let cur in result.silver) {
+        res_html += "<li>" + silver + result.silver[cur] +  "</li>"
+    }
+    for (let cur in result.part) {
+        res_html += "<li>" + blank + result.part[cur] + "</li>"
+    }
+    res_html+="</ul>";
+    return res_html;
+        // <circle class="gold" cx="176" cy="12" r="8"></circle>
+        // <circle class="silver" cx="258" cy="12" r="8" ></circle>
+}
+
+
+let tip = function (d) {
+    let div_tip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+    div_tip.transition()
+        .duration(200)
+        .style("opacity", .95);
+    d3.select("body").select('div.tooltip')
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY) + "px")
+        .style("display", "inline-block")
+        .html(getInfo(d));
+};

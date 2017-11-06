@@ -151,3 +151,26 @@ header {
     font-size: 14px;
 
 }
+ul#tip {
+    list-style: none;
+    margin-left: 5px;
+    padding-left: 5px;
+
+}
+div.tooltip {
+    position: absolute;
+    text-align: left;
+    width: auto;
+    height: auto;
+    padding: 2px;
+    padding-right: 7px;
+    font-size: 12px;
+    background: white;
+    border-width: 2px;
+    border-color: #d20a11;
+    border-radius: 6px;
+    pointer-events: none;
+}
+li > .gold {
+    margin-right: 2px;
+}

@@ -7,10 +7,10 @@ class BarChart {
      * @param infoPanel
      * @param allData
      */
-    constructor(allData) {
+    constructor() {
         // this.worldMap = worldMap;
         // this.infoPanel = infoPanel;
-        this.allData = allData;
+        this.allData = window.allData;
         this.xScale;
         this.yScale;
         this.drawBarChart();
@@ -204,6 +204,7 @@ class BarChart {
         d3.select('svg#barChart').selectAll('.selected').classed('selected', false);
         d3.select(this)
             .classed('selected', true);
+        d3.select('div.tooltip').remove();
         infoPanel.updateInfo(cur);
         worldMap.updateMap(cur);
 
