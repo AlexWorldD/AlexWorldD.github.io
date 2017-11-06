@@ -5,8 +5,8 @@ class Map {
      */
     constructor() {
         this.projection = d3.geoConicConformal().scale(150).translate([400, 350]);
-        this.map = d3.select('#map');
-        this.points = d3.select('#points');
+        this.map = d3.select('svg#world_map').select('#map');
+        this.points = d3.select('svg#world_map').select('#points');
     }
 
     /**
@@ -75,7 +75,8 @@ class Map {
         // First of all create var with converter from GEOJson to string for svg
         let path = d3.geoPath()
             .projection(this.projection);
-        let countries = topojson.feature(world, world.objects.countries).features;
+        // let countries = topojson.feature(world, world.objects.countries).features;
+        let countries = world.features;
         this.map.selectAll('path')
             .data(countries)
             .enter()

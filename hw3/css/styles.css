@@ -142,7 +142,10 @@ header {
     fill: none;
     stroke: black;
 }
-
+#map {
+    width: 900px;
+    height: 600px;
+}
 #xAxis text,
 #yAxis text {
     font-size: 14px;

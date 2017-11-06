@@ -7,9 +7,9 @@ class BarChart {
      * @param infoPanel
      * @param allData
      */
-    constructor(worldMap, infoPanel, allData) {
-        this.worldMap = worldMap;
-        this.infoPanel = infoPanel;
+    constructor(allData) {
+        // this.worldMap = worldMap;
+        // this.infoPanel = infoPanel;
         this.allData = allData;
         this.xScale;
         this.yScale;
@@ -19,7 +19,7 @@ class BarChart {
     drawBarChart(selectedDimension) {
         // ******* TODO: PART I *******
         if (selectedDimension === undefined) {
-            selectedDimension = d3.select('#dataset').property("value");
+            selectedDimension = d3.select('select#dataset').property("value");
         }
 
         let max = d3.max(this.allData, function (d) {
@@ -29,7 +29,7 @@ class BarChart {
         // space for the labels
         let textWidth = 70;
         // Getting required encoder of bars
-        let svg = d3.select('#barChart'),
+        let svg = d3.select('svg#barChart'),
             padding = {top: 20, right: 10, bottom: 20, left: 20},
             margin = {top: 10, right: 5, bottom: 40, left: 60},
             height = +svg.attr("height"),
@@ -93,7 +93,7 @@ class BarChart {
             .domain([0, max]);
 
         //---------------- Enter and Enter Animations ------------------------
-        d3.select('#bars').selectAll('rect.bar')
+        svg.select('#bars').selectAll('rect.bar')
             .data(this.allData)
             .enter().append('rect')
             .attr('class', 'bar')
@@ -113,11 +113,10 @@ class BarChart {
             .style('fill', function (d) {
                 return colorScale(d[selectedDimension])
             });
-        d3.selectAll('rect.bar').on("click", this.selectCup);
+        svg.selectAll('rect.bar').on("click", this.selectCup);
         this.xScale = xScale;
         this.yScale = yScale;
-        let rnd = Math.floor(Math.random() * this.allData.length);
-        let t = d3.selectAll('rect.bar');
+        // let rnd = Math.floor(Math.random() * this.allData.length);
         // t.classed('selected', true)
         // ******* TODO: PART II *******
 
@@ -132,7 +131,7 @@ class BarChart {
     update(selectedDimension) {
 
         if (selectedDimension === undefined) {
-            selectedDimension = d3.select('#dataset').property("value");
+            selectedDimension = d3.select('select#dataset').property("value");
         }
 
         let max = d3.max(this.allData, function (d) {
@@ -140,7 +139,7 @@ class BarChart {
         });
 
         // Getting required encoder of bars
-        let svg = d3.select('#barChart'),
+        let svg = d3.select('svg#barChart'),
             margin = {top: 10, right: 5, bottom: 40, left: 60},
             height = +svg.attr("height");
         // Update Y-Axis
@@ -175,7 +174,7 @@ class BarChart {
             .domain([0, max]);
 
         //---------------- Update height of bars + Animations ------------------------
-        d3.select('#bars').selectAll('rect.bar')
+        svg.select('#bars').selectAll('rect.bar')
             // .attr('class', 'bar')
             .transition().duration(2000)
             .attr('y', function (d) {
@@ -202,9 +201,9 @@ class BarChart {
     }
     selectCup(cur) {
         // Del previous selection
-        d3.selectAll('.selected').classed('selected', false);
+        d3.select('svg#barChart').selectAll('.selected').classed('selected', false);
         d3.select(this)
-            .classed('selected', true)
+            .classed('selected', true);
         infoPanel.updateInfo(cur);
         worldMap.updateMap(cur);
 

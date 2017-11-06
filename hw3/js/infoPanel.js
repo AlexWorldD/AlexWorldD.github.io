@@ -2,7 +2,7 @@
 class InfoPanel {
     constructor() {
         let details = d3.select('#details');
-        this.edition = details.select('#edition');
+        this.edition = details.select('h2#edition');
         this.host = details.select('#host');
         this.winner = details.select('#winner');
         this.silver = details.select('#silver');
