@@ -139,7 +139,7 @@ class BarChart {
         });
 
         // Getting required encoder of bars
-        let svg = d3.select('svg#barChart'),
+        let svg = d3.select('div#bar-chart').select('svg#barChart'),
             margin = {top: 10, right: 5, bottom: 40, left: 60},
             height = +svg.attr("height");
         // Update Y-Axis

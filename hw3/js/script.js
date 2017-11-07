@@ -65,7 +65,9 @@ function chooseData() {
 //
 //         }
 //     });
-function getInfo(cur) {
+
+
+function getInfo(cur, iso=false) {
     let result = {
         'winner': new Array(),
         'silver': new Array(),
@@ -73,20 +75,37 @@ function getInfo(cur) {
     };
     for (let it=0; it<window.allData.length; it++) {
         let d = window.allData[it];
-        if (d.teams_names.includes(cur)) {
-            if (d.winner == cur) {
-                result.winner.push(d.EDITION);
-            }
-            if (d.runner_up==cur) {
-                result.silver.push(d.EDITION)
-            }
-            else {
-                result.part.push(d.EDITION)
-            }
+        if (iso==false) {
+            if (d.teams_names.includes(cur)) {
+                if (d.winner == cur) {
+                    result.winner.push(d.EDITION);
+                }
+                if (d.runner_up==cur) {
+                    result.silver.push(d.EDITION)
+                }
+                else {
+                    result.part.push(d.EDITION)
+                }
 
+            }
+        }
+        else {
+            if (d.teams_iso.includes(cur)) {
+                if (d.winner_code == cur) {
+                    result.winner.push(d.EDITION);
+                }
+                if (d.runner_code==cur) {
+                    result.silver.push(d.EDITION)
+                }
+                else {
+                    result.part.push(d.EDITION)
+                }
+
+            }
         }
 
     }
+
     let gold = "<svg width=\"10\" height=\"10\"><circle class=\"gold\" cx=\"5\" cy=\"5\" r=\"4\"></circle></svg>";
     let silver = "<svg width=\"10\" height=\"10\"><circle class=\"silver\" cx=\"5\" cy=\"5\" r=\"4\"></circle></svg>";
     let blank = "<svg width=\"10\" height=\"10\"></svg>";
@@ -101,13 +120,20 @@ function getInfo(cur) {
         res_html += "<li>" + blank + result.part[cur] + "</li>"
     }
     res_html+="</ul>";
+    if (res_html=="<ul id=\"tip\"></ul>") {
+        res_html = 'Lionel Messi the Greatest Of All Time!';
+    }
     return res_html;
         // <circle class="gold" cx="176" cy="12" r="8"></circle>
         // <circle class="silver" cx="258" cy="12" r="8" ></circle>
 }
 
 
-let tip = function (d) {
+let tip = function (d, map=false) {
+    // AWFULLL, but how I can do it on the other way...?
+    if (map!==true) {
+        map = false;
+    }
     let div_tip = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
@@ -118,5 +144,5 @@ let tip = function (d) {
         .style("left", (d3.event.pageX) + "px")
         .style("top", (d3.event.pageY) + "px")
         .style("display", "inline-block")
-        .html(getInfo(d));
+        .html(getInfo(d, map));
 };

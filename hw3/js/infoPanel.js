@@ -17,15 +17,21 @@ class InfoPanel {
 
         // ******* TODO: PART III *******
         this.edition.text(oneWorldCup.EDITION);
-        this.host.text(oneWorldCup.host);
-        this.winner.text(oneWorldCup.winner);
-        this.silver.text(oneWorldCup.runner_up);
+        this.host.text(oneWorldCup.host).on('click', function () {
+            tip(oneWorldCup.host);
+        });
+        this.winner.text(oneWorldCup.winner).on('click', function () {
+            tip(oneWorldCup.winner);
+        });
+        this.silver.text(oneWorldCup.runner_up).on('click', function () {
+            tip(oneWorldCup.runner_up);
+        });
         let countries = oneWorldCup.teams_names.sort(d3.ascending);
         // Del previous list of participants
         let cur_list = this.teams;
         cur_list.selectAll('ul')
             .remove();
-
+        // d3.select('#host').on('click', tip());
         // let div = d3.select("body").append("div")
         //     .attr("class", "tooltip")
         //     .style("opacity", 0);

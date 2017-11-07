@@ -85,6 +85,9 @@ class Map {
             .attr('id', function (d) {
                 return d.id;
             })
+            .on('click', function () {
+                tip(this.id, true)
+            })
             .attr('d', path);
         this.map
             .append('path')
