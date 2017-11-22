@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Homework #4.1</title>
+    <meta name="description" content="HW4.1">
+    <meta name="author" content="iLex">
+    <link rel="stylesheet" href="css/styles.css"/>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    <script src="https://d3js.org/colorbrewer.v1.js"></script>
+    <script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="js/scripts.js" async></script>
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="content">
+<div class="header_group">
+    <h1>4th Homework vol.1</h1>
+    <!--<input id="toggle-on" class="toggle toggle-left" name="toggle" value="Table" type="radio" checked>-->
+    <!--<label for="toggle-on" class="btn">Table</label>-->
+    <!--<input id="toggle-off" class="toggle toggle-right" name="toggle" value="Bar chart" type="radio">-->
+    <!--<label for="toggle-off" class="btn">Bar chart</label>-->
+</div>
+<div class="filters">
+    <div class="container">
+        <h3 id="filter" style="color: #1946ba">Filtering z_One:</h3>
+        <div id="by_encode">
+            <span>Encode by: </span>
+            <select id="Encoding">
+                <option value="GDP" selected> GDP</option>
+                <option value="Population"> Population</option>
+            </select>
+            <label>
+                <input type="checkbox" name="Rank" value="Rank"> Rank</label>
+        </div>
+        <br>
+        <div id="by_global_layout">
+            <span>Global layout: </span>
+            <label><input type="radio" name="layout" value="force"> Force</label>
+            <label><input type="radio" name="layout" value="random"> Random</label>
+            <label><input type="radio" name="layout" value="circular"> Circular</label>
+            <label><input type="radio" name="layout" value="line" checked> Line</label>
+        </div>
+        <br>
+        <div id="by_group_layout">
+            <span>Local layout: </span>
+            <label><input type="radio" name="layout" value="force" checked> Force</label>
+            <label><input type="radio" name="layout" value="random"> Random</label>
+            <label><input type="radio" name="layout" value="circular"> Circular</label>
+            <label><input type="radio" name="layout" value="line"> Line</label>
+        </div>
+        <br>
+        <div id="color">
+            <span>Coloring: </span>
+            <label>
+                <input type="radio" name="aggregation" value="None" title="None"
+                       checked> None</label>
+            <label>
+                <input type="radio" name="aggregation" value="byContinent" title="byContinent"
+                > by Continent</label>
+        </div>
+        <br>
+    </div>
+</div>
+</div>
+<div class="page_data">
+    <svg id="graph" width="90%" height="960">
+    </svg>
+</div>
+</body>
+</html>
