@@ -68,9 +68,9 @@ class Table {
         // ******* TODO: PART II *******
 
         d3.select('#goalHeader').append('svg')
-            .style('padding', '0 0 0 5px')
+            .style('padding', '0 0px 0 15px')
             .attr('height', this.cell.height+5)
-            .attr('width', 2*this.cell.width+10)
+            .attr('width', 2*this.cell.width+20)
             .append('g')
             .attr('transform', 'translate(' + 0 + ',' + 20 + ')')
             .call(d3.axisTop(this.goalScale));
@@ -96,15 +96,15 @@ class Table {
         rows = rows.enter()
             .append('tr')
             .merge(rows);
-        // rows
-        //     .on('click', (d, i) => {
-        //         if (d.value.type == 'aggregate') {
-        //             this.updateList(d, i);
-        //         }
-        //
-        //     })
+        rows
+            .on('click', (d, i) => {
+                if (d.value.type == 'aggregate') {
+                    this.updateList(d, i);
+                }
 
-
+            });
+        // KOSTYL' here %)
+        rows.selectAll('td').remove();
         let tds = rows.selectAll('td')
             .data(function (d) {
                 // console.log(d);
@@ -121,15 +121,32 @@ class Table {
         tds = tds.enter()
             .append('td')
             .merge(tds);
+        // TITLE TDs --------------
         tds.filter(function (d) {
-            return d.vis == 'title'
+            return d.type == 'game'
+        })
+            .attr('class', 'hide');
+        tds.filter(function (d) {
+            return d.vis == 'title' && d.type == 'aggregate'
         })
             .attr('class', 'aggregate')
             .text(d => d.value);
         tds.filter(function (d) {
-            return d.vis == 'text'
+            return d.vis == 'title' && d.type == 'game'
+        })
+            .attr('class', 'game_type')
+            .text(d => 'x'+d.value);
+        // RESULT TDs --------------
+        tds.filter(function (d) {
+            return d.vis == 'text' && d.type == 'aggregate'
         })
             .text(d => d.value);
+        tds.filter(function (d) {
+            return d.vis == 'text' && d.type == 'game'
+        })
+            .style('opacity', 0.66)
+            .text(d => d.value);
+        // BARS TDs --------------
         // Work with bars for game stats
         var bar_items = tds.filter(function (d) {
             return d.type == 'aggregate' && d.vis == 'bar' && d.value>0
@@ -151,19 +168,21 @@ class Table {
             .attr('x', d=> this.gameScale(d.value-0.9))
             // .attr('dx', '-0.05em')
             .attr('class', 'label');
-        // Work with goals vis
+        // GOALS TDs --------------
+        // Work with AGGREGATED goals vis
         var goals_items = tds.filter(function (d) {
             return d.type == 'aggregate' && d.vis == 'goals'
         })
             .append('svg')
-            .attr('width', 2*this.cell.width+5)
+            .style('padding', '0 5px 0 15px')
+            .attr('width', 2*this.cell.width+10)
             .attr('height', this.cell.height)
             .append('g');
         goals_items.append('rect')
             .attr('width', d => this.goalScale(Math.abs(d.value[0]-d.value[1])))
             .attr('x', d => this.goalScale(Math.min(d.value[0],d.value[1])))
-            .attr('height', 10)
-            .attr('y', this.cell.height/2-5)
+            .attr('height', 12)
+            .attr('y', this.cell.height/2-6)
             .attr('dy', '0.33em')
             .style('fill', d=> d.value[0] < d.value[1] ? '#cb181d' : '#034e7b')
             .attr('class', 'goalBar');
@@ -179,6 +198,37 @@ class Table {
             .attr('cy', this.cell.height/2)
             .style('fill', d=> d.value[0]-d.value[1]==0 ? '#555555':'#cb181d')
             .attr('class', 'goalCircle');
+        // Work with GAMED goals vis
+        var goals_items2 = tds.filter(function (d) {
+            return d.type == 'game' && d.vis == 'goals'
+        })
+            .append('svg')
+            .style('padding', '0 5px 0 15px')
+            .attr('width', 2*this.cell.width+5)
+            .attr('height', this.cell.height)
+            .append('g');
+        goals_items2.append('rect')
+            .attr('width', d => this.goalScale(Math.abs(d.value[0]-d.value[1])))
+            .attr('x', d => this.goalScale(Math.min(d.value[0],d.value[1])))
+            .attr('height', 3)
+            .attr('y', (this.cell.height-3)/2)
+            .attr('dy', '0.33em')
+            .style('fill', d=> d.value[0] < d.value[1] ? '#cb181d' : '#034e7b')
+            .attr('class', 'goalBar');
+        // Blue one
+        goals_items2.append('circle')
+            .attr('cx', d => this.goalScale(d.value[0]))
+            .attr('cy', this.cell.height/2)
+            .style('fill', 'white')
+            .style('stroke', '#034e7b')
+            .attr('class', 'goalCircle2');
+        // Red one
+        goals_items2.append('circle')
+            .attr('cx', d => this.goalScale(d.value[1]))
+            .attr('cy', this.cell.height/2)
+            .style('fill', 'white')
+            .style('stroke', d=> d.value[0]-d.value[1]==0 ? '#555555':'#cb181d')
+            .attr('class', 'goalCircle2');
         console.log(goals_items)
 
 
@@ -202,10 +252,17 @@ class Table {
      * Updates the global tableElements variable, with a row for each row to be rendered in the table.
      *
      */
-    updateList(i) {
+    updateList(data, i) {
         // ******* TODO: PART IV *******
-
+        let patch = this.tableElements[i].value.games;
+        if (this.tableElements.length==i+1 || this.tableElements[i+1].value.type=='aggregate') {
+            this.tableElements.splice(1+i, 0, ...patch);
+        }
+        else {
+            this.tableElements.splice(1+i, patch.length)
+        }
         //Only update list for aggregate clicks, not game clicks
+        this.updateTable();
 
     }
 

@@ -22,16 +22,27 @@ tbody tr:first-child td {
 tbody th:nth-child(3),td:nth-child(3){
     width: 125px;
 }
+tbody td:nth-child(2){
+    padding: 0;
+}
 tbody th{
     cursor:pointer;
     font-weight: bold;
 }
 
 .aggregate{
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
     color: #317f19;
 }
 
 .game{
+    color: #b1b1b1;
+}
+.game_type{
+    text-align: right;
+    padding-right: 10px;
     color: #b1b1b1;
 }
 
@@ -42,8 +53,12 @@ tbody td + td {
     color:black
 }
 
-
-
+tbody td + td.hide {
+    padding-right: 5px;
+    padding-left: 5px;
+    border-left: dashed 1px #e2e2e2;
+    color:black
+}
 tbody tr:hover {
     background-color: #dbdbdb;
 }
@@ -112,9 +127,12 @@ header {
 
 .goalCircle{
     stroke-width: 3px;
+    r:6;
+}
+.goalCircle2{
+    stroke-width: 2px;
     r:5;
 }
-
 
 .node circle {
     fill: #be2714;

@@ -48,7 +48,7 @@ d3.csv("data/fifa-matches.csv", function (error, matchesCSV) {
         'Group': 0
     };
     function getGames(data) {
-        result = [];
+        let result = [];
         for (let it in data) {
             result.push({
                 'key': data[it]['Opponent'],
@@ -67,7 +67,7 @@ d3.csv("data/fifa-matches.csv", function (error, matchesCSV) {
                 }
             })
         }
-        return result
+        return result.sort((a,b) => (a.value.Result.ranking> b.value.Result.ranking ? -1 : 1))
     }
 
     let teamData = d3.nest().key(d => d.Team)
