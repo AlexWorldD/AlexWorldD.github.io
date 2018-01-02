@@ -17,9 +17,11 @@ thead td , th{
 }
 
 tbody tr:first-child td {
-    padding-top: 2px;
+     padding-top: 2px;
+ }
+tbody th:nth-child(3),td:nth-child(3){
+    width: 125px;
 }
-
 tbody th{
     cursor:pointer;
     font-weight: bold;
@@ -33,12 +35,14 @@ tbody th{
     color: #b1b1b1;
 }
 
-tbody td {
+tbody td + td {
     padding-right: 5px;
     padding-left: 5px;
     border-left: solid 1px #000;
     color:black
 }
+
+
 
 tbody tr:hover {
     background-color: #dbdbdb;
@@ -147,7 +151,7 @@ header {
 }
 
 .view {
-    width: 650px;
+    width: 700px;
     padding: 0.5em;
     float: left;
 }
