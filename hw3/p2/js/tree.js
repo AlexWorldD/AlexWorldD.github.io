@@ -45,21 +45,10 @@ class Tree {
         // Align based on parents position:
         nodes.append('text')
             .attr('x', d => (d.children ? -13 : 13))
-            .attr('y', d=>(d.parent && d.children ? (d.data.Name===d.parent.children[0].data.Name ? -13: 13): 0))
+            .attr('y', d => (d.parent && d.children ? (d.data.Name === d.parent.children[0].data.Name ? -13 : 13) : 0))
             .attr('dy', '0.33em')
-            .style('text-anchor', d=> (d.children ? 'end': 'start'))
-            .text(d=>d.data.Name);
-
-
-        console.log(this.nodes);
-
-
-        //Create a root for the tree using d3.stratify(); 
-
-
-        //Add nodes and links to the tree. 
-
-
+            .style('text-anchor', d => (d.children ? 'end' : 'start'))
+            .text(d => d.data.Name);
     };
 
     /**
@@ -70,7 +59,31 @@ class Tree {
      */
     updateTree(row) {
         // ******* TODO: PART VII *******
-
+        d3.selectAll('.link')
+            .filter(d=> {
+                if(row.value.type==='game') {
+                    let one = row.key===d.data.Name && row.value.opponent===d.data.data.Opponent;
+                    let two = row.key===d.data.data.Opponent && row.value.opponent===d.data.Name;
+                    return one || two;
+                }
+                else {
+                    return row.key===d.data.Name && row.key===d.parent.data.Name;
+                }
+            })
+            .classed('selected', true);
+        d3.selectAll('.node')
+            .selectAll('text')
+            .filter(d=> {
+                if(row.value.type==='game') {
+                    let one = row.key===d.data.Name && row.value.opponent===d.data.data.Opponent;
+                    let two = row.key===d.data.data.Opponent && row.value.opponent===d.data.Name;
+                    return one || two;
+                }
+                else {
+                    return row.key===d.data.Name;
+                }
+            })
+            .classed('selectedLabel', true);
     }
 
     /**
@@ -78,7 +91,10 @@ class Tree {
      */
     clearTree() {
         // ******* TODO: PART VII *******
-
-        // You only need two lines of code for this! No loops! 
+        d3.selectAll('.link')
+            .classed('selected', false);
+        d3.selectAll('.node')
+            .selectAll('text')
+            .classed('selectedLabel', false);
     }
 }

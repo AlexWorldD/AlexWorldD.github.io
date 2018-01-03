@@ -167,7 +167,12 @@ class Table {
                     this.updateList(d, i);
                 }
 
-            });
+            })
+            .on('mouseover', (d, i) => {
+                this.tree.clearTree();
+                this.tree.updateTree(d);
+            })
+            .on('mouseout', _ => this.tree.clearTree());
         // KOSTYL' here %)
         rows.selectAll('td').remove();
         let tds = rows.selectAll('td')
@@ -298,6 +303,7 @@ class Table {
             .attr('class', 'goalCircle2');
 
     };
+
     updateList(data, i) {
         // ******* TODO: PART IV *******
         let patch = this.tableElements[i].value.games;
@@ -311,6 +317,7 @@ class Table {
         this.updateTable();
 
     }
+
     collapseList() {
         // ******* TODO: PART IV *******
         this.tableElements = this.tableElements.filter(d => d.value.type === 'aggregate')
