@@ -5,13 +5,17 @@ table {
     /*width: 720px;*/
 }
 
-th {
+th.title {
     font-weight: normal;
     text-align: right;
     padding-right: 6px;
     min-width: 125px;
 }
-
+th.h_left
+{
+    padding-left: 2px;
+    text-align: left;
+}
 thead td , th{
     cursor: s-resize;
 }
@@ -56,14 +60,14 @@ tbody td + td {
 tbody td + td.hide {
     padding-right: 5px;
     padding-left: 5px;
-    border-left: dashed 1px #e2e2e2;
+    border-left: dashed 1px #f0f0f0;
     color:black
 }
 tbody tr:hover {
     background-color: #dbdbdb;
 }
 
-tbody tr .game {
+tbody tr:hover td.hide {
     background-color: #f0f0f0;
 }
 
@@ -74,6 +78,18 @@ tbody tr .game {
 .label{
     fill: #ffffff;
     font: 14px sans-serif;
+}
+
+th.des:after {
+    color: black;
+    font-size: x-small;
+    content: "\21E9";
+}
+
+th.aes:after {
+    color: black;
+    font-size: x-small;
+    content: "\21E7";
 }
 
 @font-face {
@@ -169,7 +185,7 @@ header {
 }
 
 .view {
-    width: 700px;
+    width: 710px;
     padding: 0.5em;
     float: left;
 }

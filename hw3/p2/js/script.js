@@ -98,7 +98,7 @@ d3.csv("data/fifa-matches.csv", function (error, matchesCSV) {
 
         //Create Tree Object
         let tree = new Tree();
-        // tree.createTree(treeCSV);
+        tree.createTree(treeCSV);
 
         //Create Table Object and pass in reference to tree object (for hover linking)
         let table = new Table(teamData,tree);
