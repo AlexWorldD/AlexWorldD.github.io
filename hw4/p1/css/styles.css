@@ -3,6 +3,16 @@ body {
     font-family: "Open Sans";
 }
 
+.label_node {
+    font-size: 10px;
+
+}
+#graph
+{
+    display: block;
+    margin: auto;
+    width: 90%;
+}
 h1 {
     display: inline-block;
     color: #1946ba;
