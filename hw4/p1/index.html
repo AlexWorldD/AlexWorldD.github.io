@@ -28,6 +28,13 @@
 <div class="filters">
     <div class="container">
         <h3 id="filter" style="color: #1946ba">Filtering z_One:</h3>
+        <div id="mode">
+            <span>Mode: </span>
+            <label><input type="radio" name="mode" value="list" checked> List</label>
+            <label><input type="radio" name="mode" value="scatter"> Scatter</label>
+            <label><input type="radio" name="mode" value="mix"> Complex/Mix</label>
+        </div>
+        <br>
         <div id="by_encode">
             <span>Encode by: </span>
             <select id="Encoding">
@@ -38,22 +45,6 @@
                 <input type="checkbox" name="Rank" value="Rank"> Rank</label>
         </div>
         <br>
-        <div id="by_global_layout">
-            <span>Global layout: </span>
-            <label><input type="radio" name="layout" value="force"> Force</label>
-            <label><input type="radio" name="layout" value="random"> Random</label>
-            <label><input type="radio" name="layout" value="circular"> Circular</label>
-            <label><input type="radio" name="layout" value="line" checked> Line</label>
-        </div>
-        <br>
-        <div id="by_group_layout">
-            <span>Local layout: </span>
-            <label><input type="radio" name="layout" value="force" checked> Force</label>
-            <label><input type="radio" name="layout" value="random"> Random</label>
-            <label><input type="radio" name="layout" value="circular"> Circular</label>
-            <label><input type="radio" name="layout" value="line"> Line</label>
-        </div>
-        <br>
         <div id="color">
             <span>Coloring: </span>
             <label>
@@ -62,6 +53,22 @@
             <label>
                 <input type="radio" name="aggregation" value="byContinent" title="byContinent"
                 > by Continent</label>
+        </div>
+        <div id="mix_filters">
+            <br>
+            <div id="by_global_layout">
+                <span>Global layout: </span>
+                <label><input type="radio" name="global_l" value="none" checked> None</label>
+                <label><input type="radio" name="global_l" value="force"> Force</label>
+                <label><input type="radio" name="global_l" value="circular"> Circular</label>
+            </div>
+            <br>
+            <div id="by_group_layout">
+                <span>Local layout: </span>
+                <label><input type="radio" name="group_l" value="none" checked> None</label>
+                <label><input type="radio" name="group_l" value="force"> Force</label>
+                <label><input type="radio" name="group_l" value="circular"> Circular</label>
+            </div>
         </div>
         <br>
     </div>

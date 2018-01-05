@@ -4,15 +4,34 @@ body {
 }
 
 .label_node {
-    font-size: 10px;
+    font-size: 12px;
 
+}
+.dot_node {
+    fill: white;
+    stroke: #1E90FF;
+    stroke-width: 1.4px;
+}
+.node:hover .dot_node {
+    fill:  #1E90FF;
 }
 #graph
 {
     display: block;
     margin: auto;
-    width: 90%;
+    padding-top: 10px;
+    padding-left: 20px;
+    /*width: 90%;*/
 }
+.links line {
+    stroke: #999;
+    stroke-opacity: 0.15px;
+}
+/*.nodes circle {*/
+    /*stroke: #fff;*/
+    /*stroke-width: 1px;*/
+/*}*/
+
 h1 {
     display: inline-block;
     color: #1946ba;
@@ -307,4 +326,8 @@ input[type=range]:focus::-ms-fill-lower {
 
 input[type=range]:focus::-ms-fill-upper {
     background: #ccc;
+}
+
+#mix_filters {
+    display: none;
 }
