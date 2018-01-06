@@ -24,6 +24,7 @@ let simulation = d3.forceSimulation()
 let node_radius = 7;
 let encoding = 'None';
 let ranking = false;
+let coordinates = 'geo';
 let continents = {
     'Africa': 'dot_africa',
     'Americas': 'dot_americas',
@@ -98,6 +99,26 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
             });
     }
 
+    let geo_scale = {
+        'X': d3.scaleLinear()
+            .domain([d3.min(graph.nodes, d => d['Longitude']),
+                d3.max(graph.nodes, d => d['Longitude'])])
+            .range([30, 1200]),
+        'Y': d3.scaleLinear()
+            .domain([d3.min(graph.nodes, d => d['Latitude']),
+                d3.max(graph.nodes, d => d['Latitude'])])
+            .range([900, 30])
+    };
+    let pop_scale = {
+        'X': d3.scaleLinear()
+            .domain([d3.min(graph.nodes, d => d['GDP']),
+                d3.max(graph.nodes, d => d['GDP'])])
+            .range([30, 1100]),
+        'Y': d3.scaleLinear()
+            .domain([d3.min(graph.nodes, d => d['Population']),
+                d3.max(graph.nodes, d => d['Population'])])
+            .range([900, 30])
+    };
     // Ctrl+C & Ctrl+V from https://codepen.io/_avt_/pen/rGQQPw?editors=1000
     // TODO fix dragging
     function dragstarted(d) {
@@ -139,7 +160,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     // });
     function draw_list() {
         simulation.stop();
-        if (!ranking) {
+        if (!ranking || (ranking && encoding === 'None')) {
             if (encoding !== 'None') {
                 graph.nodes.sort((a, b) => d3.descending(a[encoding], b[encoding]));
             }
@@ -172,11 +193,32 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
 
     }
 
+    function draw_scatter() {
+        simulation.stop();
+        if (coordinates === 'geo') {
+            graph.nodes.forEach((d, i) => {
+                d.x = geo_scale.X(d['Longitude']);
+                d.y = geo_scale.Y(d['Latitude'])
+            });
+
+        }
+        if (coordinates === 'pop_gdp') {
+            graph.nodes.forEach((d, i) => {
+                d.x = pop_scale.X(d['GDP']);
+                d.y = pop_scale.Y(d['Population'])
+            });
+        }
+        svg
+            .attr('height', 900 + 20);
+        graph_update(999);
+    }
+
     get_encode();
     //    ----------
     // Additional functions
     // Table-Bar switcher
     d3.selectAll('input[type=radio][name="mode"]').on("change", update_filters);
+    d3.selectAll('input[type=radio][name="coordinates"]').on("change", update_vis);
     d3.select('#Encoding').on("change", update_vis);
     d3.select('input[type=checkbox][name="Rank"]').on('change', update_vis);
     d3.selectAll('input[type=radio][name="coloring"]').on("change", update_color);
@@ -189,27 +231,36 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         else {
             d3.select('#mix_filters').style("display", "none");
         }
+        if (cur_page === 'scatter') {
+            d3.select('#scatter_filters').style("display", "block");
+        }
+        else {
+            d3.select('#scatter_filters').style("display", "none");
+        }
         update_vis();
     }
+
     function update_color() {
         let color = d3.select('input[name="coloring"]:checked').node().value;
-        if (color==='byContinent') {
+        if (color === 'byContinent') {
             nodes.selectAll('circle')
                 .transition()
                 .duration(500)
-                .attr('class', d=>continents[d.Continent]+' dot_node');
+                .attr('class', d => continents[d.Continent] + ' dot_node');
         }
         else {
             nodes.selectAll('circle')
                 .transition()
                 .duration(500)
-                .attr('class','dot_node')
+                .attr('class', 'dot_node')
         }
     }
+
     function get_encode() {
         // Getting encode parameters from imput form
         ranking = d3.select('input[type=checkbox][name="Rank"]').node().checked;
         encoding = d3.select('#Encoding').node().value;
+        coordinates = d3.select('input[name="coordinates"]:checked').node().value;
     }
 
     function update_vis() {
@@ -218,6 +269,9 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         switch (cur_page) {
             case "list":
                 draw_list();
+                break;
+            case 'scatter':
+                draw_scatter();
         }
     }
 });
