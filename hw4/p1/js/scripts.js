@@ -24,6 +24,13 @@ let simulation = d3.forceSimulation()
 let node_radius = 7;
 let encoding = 'None';
 let ranking = false;
+let continents = {
+    'Africa': 'dot_africa',
+    'Americas': 'dot_americas',
+    'Europe': 'dot_europe',
+    'Asia': 'dot_asia',
+    'Oceania': 'dot_oceania'
+};
 d3.json('data/countries_1995_2012.json', function (error, data) {
     if (error) throw error;
 
@@ -172,6 +179,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     d3.selectAll('input[type=radio][name="mode"]').on("change", update_filters);
     d3.select('#Encoding').on("change", update_vis);
     d3.select('input[type=checkbox][name="Rank"]').on('change', update_vis);
+    d3.selectAll('input[type=radio][name="coloring"]').on("change", update_color);
 
     function update_filters() {
         let cur_page = d3.select('input[name="mode"]:checked').node().value;
@@ -183,7 +191,21 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         }
         update_vis();
     }
-
+    function update_color() {
+        let color = d3.select('input[name="coloring"]:checked').node().value;
+        if (color==='byContinent') {
+            nodes.selectAll('circle')
+                .transition()
+                .duration(500)
+                .attr('class', d=>continents[d.Continent]+' dot_node');
+        }
+        else {
+            nodes.selectAll('circle')
+                .transition()
+                .duration(500)
+                .attr('class','dot_node')
+        }
+    }
     function get_encode() {
         // Getting encode parameters from imput form
         ranking = d3.select('input[type=checkbox][name="Rank"]').node().checked;

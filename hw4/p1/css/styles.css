@@ -12,8 +12,38 @@ body {
     stroke: #1E90FF;
     stroke-width: 1.4px;
 }
+.dot_africa {
+    stroke: #ff7221;
+}
+.dot_americas {
+    stroke: #3f56ff;
+}
+.dot_europe {
+    stroke: #be4dff;
+}
+.dot_asia {
+    stroke: #ffe541;
+}
+.dot_oceania {
+    stroke: #87ff5d;
+}
 .node:hover .dot_node {
     fill:  #1E90FF;
+}
+.node:hover .dot_africa {
+    fill:  #ff7221;
+}
+.node:hover .dot_americas {
+    fill:  #3f56ff;
+}
+.node:hover .dot_europe {
+    fill:  #be4dff;
+}
+.node:hover .dot_asia {
+    fill:  #ffe541;
+}
+.node:hover .dot_oceania {
+    fill:  #87ff5d;
 }
 .node:hover .label_node {
     font-weight: bolder;
