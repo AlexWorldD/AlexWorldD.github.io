@@ -10,7 +10,7 @@ let height = 1280 - margin.top - margin.bottom;
 svg
     .attr('width', width)
     .attr('height', height);
-let center = {x: window.innerWidth / 2, y: height / 2};
+let center = {x: width / 2, y: height / 4};
 let simulation = d3.forceSimulation()
     .force('charge', d3.forceManyBody().strength(-100))
     .force('x', d3.forceX().strength(0.2).x(center.x))
@@ -25,6 +25,8 @@ let node_radius = 7;
 let encoding = 'None';
 let ranking = false;
 let coordinates = 'geo';
+let global_l = 'force';
+let local_l = 'none';
 let continents = {
     'Africa': 'dot_africa',
     'Americas': 'dot_americas',
@@ -85,7 +87,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         .attr("class", "dot_node")
         .attr('r', node_radius);
 
-    function graph_update(duration) {
+    function graph_update(duration = 0) {
 
         links.transition().duration(duration)
             .attr("x1", d => d.source.x)
@@ -139,7 +141,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     }
 
     simulation.nodes(graph.nodes)
-        .on('tick', graph_update(0));
+        .on('tick', graph_update);
     // simulation.force("link")
     //     .links(graph.links);
 
@@ -213,12 +215,71 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         graph_update(999);
     }
 
+    function draw_mix() {
+        let continent_centers = {
+            'Africa': {x: 0, y: 0},
+            'Americas': {x: 0, y: 0},
+            'Europe': {x: 0, y: 0},
+            'Asia': {x: 0, y: 0},
+            'Oceania': {x: 0, y: 0},
+        };
+        // PATCH zone:
+        let cur_width = Math.min(window.innerWidth, width);
+        let cur_height = Math.min(window.innerHeight, height);
+        if (local_l === 'force') {
+            continent_centers = {
+                'Africa': {x: cur_width / 6, y: height / 4},
+                'Americas': {x: cur_width / 3, y: height / 4},
+                'Europe': {x: cur_width / 2, y: height / 4},
+                'Asia': {x: 2 * cur_width / 3, y: height / 4},
+                'Oceania': {x: 5 * cur_width / 6, y: height / 4},
+            };
+        }
+        if (local_l === 'circular') {
+            let r = Math.min(cur_width, cur_height) / 2 - 100;
+            let arc = d3.arc()
+                .outerRadius(r);
+            let pie = d3.pie()
+                .value((d, i) => 1);
+            pie(['Africa', 'Americas', 'Europe', 'Asia', 'Oceania']).map((d, i) => {
+                d.innerRadius = 0;
+                d.outerRadius = r;
+                d.x = arc.centroid(d)[0] + cur_width / 2;
+                d.y = arc.centroid(d)[1] + r+20;
+                continent_centers[d.data] = {x: d.x, y: d.y};
+            });
+            console.log(continent_centers);
+        }
+        //    TODO add patch for group position
+        if (global_l === 'force') {
+            if (local_l === 'none') {
+                simulation.force('x', d3.forceX().strength(0.15).x(Math.min(window.innerWidth / 2, center.x)));
+                simulation.force('y', d3.forceY().strength(0.15).y(center.y));
+                svg
+                    .attr('height', height / 2 + 20);
+            }
+            else {
+                simulation.force('x', d3.forceX().strength(0.15).x(d => continent_centers[d.Continent].x));
+                simulation.force('y', d3.forceY().strength(0.15).y(d => continent_centers[d.Continent].y));
+                svg
+                    .attr('height', 2*height/3);
+            }
+            simulation.alpha(1).restart();
+        }
+        else {
+
+        }
+
+    }
+
     get_encode();
     //    ----------
     // Additional functions
     // Table-Bar switcher
     d3.selectAll('input[type=radio][name="mode"]').on("change", update_filters);
     d3.selectAll('input[type=radio][name="coordinates"]').on("change", update_vis);
+    d3.selectAll('input[type=radio][name="global_l"]').on("change", update_vis);
+    d3.selectAll('input[type=radio][name="group_l"]').on("change", update_vis);
     d3.select('#Encoding').on("change", update_vis);
     d3.select('input[type=checkbox][name="Rank"]').on('change', update_vis);
     d3.selectAll('input[type=radio][name="coloring"]').on("change", update_color);
@@ -261,6 +322,8 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         ranking = d3.select('input[type=checkbox][name="Rank"]').node().checked;
         encoding = d3.select('#Encoding').node().value;
         coordinates = d3.select('input[name="coordinates"]:checked').node().value;
+        global_l = d3.selectAll('input[name="global_l"]:checked').node().value;
+        local_l = d3.selectAll('input[name="group_l"]:checked').node().value;
     }
 
     function update_vis() {
@@ -272,6 +335,9 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                 break;
             case 'scatter':
                 draw_scatter();
+                break;
+            case 'mix':
+                draw_mix();
         }
     }
 });
