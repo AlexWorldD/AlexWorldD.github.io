@@ -22,6 +22,8 @@ let simulation = d3.forceSimulation()
 // .force('center', d3.forceCenter(center.x, center.y))
 
 let node_radius = 7;
+let encoding = 'None';
+let ranking = false;
 d3.json('data/countries_1995_2012.json', function (error, data) {
     if (error) throw error;
 
@@ -89,6 +91,25 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
             });
     }
 
+    // Ctrl+C & Ctrl+V from https://codepen.io/_avt_/pen/rGQQPw?editors=1000
+    // TODO fix dragging
+    function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+    }
+
+    function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+
     simulation.nodes(graph.nodes)
         .on('tick', graph_update(0));
     // simulation.force("link")
@@ -111,42 +132,74 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     // });
     function draw_list() {
         simulation.stop();
-        graph.nodes.forEach((d, i) => {
-            d.x = 20;
-            d.y = node_radius * 3 * i;
-        });
-        let new_height = node_radius*graph.nodes.length*3+100;
-        svg
-            .attr('height', new_height);
+        if (!ranking) {
+            if (encoding !== 'None') {
+                graph.nodes.sort((a, b) => d3.descending(a[encoding], b[encoding]));
+            }
+            else {
+                graph.nodes.sort((a, b) => d3.ascending(a['Name'], b['Name']));
+            }
+
+            graph.nodes.forEach((d, i) => {
+                d.x = 20;
+                d.y = node_radius * 3 * i;
+            });
+            let new_height = node_radius * graph.nodes.length * 3 + 100;
+            svg
+                .attr('height', new_height);
+        }
+        else {
+            if (encoding !== 'None') {
+                let scale = d3.scaleLinear()
+                    .domain([0, d3.max(graph.nodes, d => d[encoding])])
+                    .range([height, 10]);
+                graph.nodes.forEach((d, i) => {
+                    d.x = 20;
+                    d.y = scale(d[encoding]);
+                });
+                svg
+                    .attr('height', height + 20);
+            }
+        }
         graph_update(999);
 
     }
+
+    get_encode();
+    //    ----------
+    // Additional functions
+    // Table-Bar switcher
+    d3.selectAll('input[type=radio][name="mode"]').on("change", update_filters);
+    d3.select('#Encoding').on("change", update_vis);
+    d3.select('input[type=checkbox][name="Rank"]').on('change', update_vis);
+
+    function update_filters() {
+        let cur_page = d3.select('input[name="mode"]:checked').node().value;
+        if (cur_page === 'mix') {
+            d3.select('#mix_filters').style("display", "block");
+        }
+        else {
+            d3.select('#mix_filters').style("display", "none");
+        }
+        update_vis();
+    }
+
+    function get_encode() {
+        // Getting encode parameters from imput form
+        ranking = d3.select('input[type=checkbox][name="Rank"]').node().checked;
+        encoding = d3.select('#Encoding').node().value;
+    }
+
+    function update_vis() {
+        let cur_page = d3.select('input[name="mode"]:checked').node().value;
+        get_encode();
+        switch (cur_page) {
+            case "list":
+                draw_list();
+        }
+    }
 });
 
-
-
-// Additional functions
-// Table-Bar switcher
-d3.selectAll('input[type=radio][name="mode"]').on("change", update_filters);
-
-function update_filters() {
-    let cur_page = d3.select('input[name="mode"]:checked').node().value;
-    if (cur_page === 'mix') {
-        d3.select('#mix_filters').style("display", "block");
-    }
-    else {
-        d3.select('#mix_filters').style("display", "none");
-    }
-    update_vis();
-}
-
-function update_vis() {
-    let cur_page = d3.select('input[name="mode"]:checked').node().value;
-    switch (cur_page) {
-        case "list":
-            draw_list();
-    }
-}
 
 // Function for preparing Data according natural language titles of columns
 function data_prepare(data) {
@@ -174,22 +227,6 @@ function data_prepare(data) {
     )
 }
 
-// Ctrl+C & Ctrl+V from https://codepen.io/_avt_/pen/rGQQPw?editors=1000
-function dragstarted(d) {
-    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-}
 
-function dragged(d) {
-    d.fx = d3.event.x;
-    d.fy = d3.event.y;
-}
-
-function dragended(d) {
-    if (!d3.event.active) simulation.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
-}
 
 

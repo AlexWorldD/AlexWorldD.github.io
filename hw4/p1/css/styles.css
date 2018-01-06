@@ -15,6 +15,9 @@ body {
 .node:hover .dot_node {
     fill:  #1E90FF;
 }
+.node:hover .label_node {
+    font-weight: bolder;
+}
 #graph
 {
     display: block;
