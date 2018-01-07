@@ -29,6 +29,15 @@ let continents = {
     'Asia': 'dot_asia',
     'Oceania': 'dot_oceania'
 };
+let pretty_line = d3.radialLine()
+    .curve(d3.curveBundle.beta(0.85))
+    .radius(function (d) {
+        return d.y;
+    })
+    .angle(function (d) {
+        return d.x / 180 * Math.PI;
+    });
+
 d3.json('data/countries_1995_2012.json', function (error, data) {
     if (error) throw error;
 
@@ -56,7 +65,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     let links = linkLayer.selectAll('.link')
         .data(graph.links)
         .enter()
-        .append('line')
+        .append('path')
         .classed('link', true);
     // .attr('stroke-width', d => Math.sqrt(d.value));
     let nodeLayer = svg.append('g')
@@ -90,6 +99,35 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
             links.classed('focus', false);
         });
     // TODO add hover function
+    function update_links(update=false) {
+        if (!update) {
+            links
+                .attr('d', function (d) {
+                    return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`
+                });
+        }
+        else {
+            links
+                .attr('d', function (d) {
+                    let lineData = [
+                        {
+                            x: Math.round(d.target.x),
+                            y: Math.round(d.target.y)
+                        }, {
+                            x: Math.round(d.target.x) - Math.round(d.target.x) / 3,
+                            y: Math.round(d.target.y) - Math.round(d.target.y) / 3
+                        },
+                        {
+                            x: Math.round(d.source.x) - Math.round(d.source.x) / 3,
+                            y: Math.round(d.source.y) - Math.round(d.source.y) / 3
+                        }, {
+                            x: Math.round(d.source.x),
+                            y: Math.round(d.source.y)
+                        }];
+                    return `M${lineData[0].x},${lineData[0].y}C${lineData[1].x},${lineData[1].y},${lineData[2].x},${lineData[2].y},${lineData[3].x},${lineData[3].y} `;
+                });
+        }
+    }
 
     // Add labels to the nodes
     nodes.append('text')
@@ -104,10 +142,28 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     function graph_update(duration = 0) {
 
         links.transition().duration(duration)
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
+                .attr('d', function (d) {
+                    let lineData = [
+                        {
+                            x: Math.round(d.target.x),
+                            y: Math.round(d.target.y)
+                        }, {
+                            x: Math.round(d.target.x) - Math.round(d.target.x) / 3,
+                            y: Math.round(d.target.y) - Math.round(d.target.y) / 3
+                        },
+                        {
+                            x: Math.round(d.source.x) - Math.round(d.source.x) / 3,
+                            y: Math.round(d.source.y) - Math.round(d.source.y) / 3
+                        }, {
+                            x: Math.round(d.source.x),
+                            y: Math.round(d.source.y)
+                        }];
+                    return `M${lineData[0].x},${lineData[0].y}C${lineData[1].x},${lineData[1].y},${lineData[2].x},${lineData[2].y},${lineData[3].x},${lineData[3].y} `;
+                });
+            // .attr("x1", d => d.source.x)
+            // .attr("y1", d => d.source.y)
+            // .attr("x2", d => d.target.x)
+            // .attr("y2", d => d.target.y);
 
         nodes.transition().duration(duration)
             .attr("transform", function (d, i) {
@@ -213,6 +269,8 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         svg
             .attr('height', 900 + 20);
         graph_update(999);
+        // update_links(true);
+
     }
 
     function draw_mix() {

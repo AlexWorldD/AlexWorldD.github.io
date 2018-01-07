@@ -81,12 +81,18 @@ body {
     /*width: 90%;*/
 }
 
+path.link {
+    fill: none;
+    stroke: #999;
+    stroke-width: 1px;
+    stroke-opacity: 0.1;
+}
 .links line {
     stroke: #999;
     stroke-opacity: 0.1;
 }
 
-line.focus {
+line.focus, path.focus {
     stroke: #1E90FF;
     stroke-width: 1.4px;
     stroke-opacity: 0.8;
