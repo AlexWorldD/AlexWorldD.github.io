@@ -15,11 +15,6 @@ let simulation = d3.forceSimulation()
     .force('charge', d3.forceManyBody().strength(-100))
     .force('x', d3.forceX().strength(0.2).x(center.x))
     .force('y', d3.forceY().strength(0.2).y(center.y));
-// .force('link', d3.forceLink().id(function (d) {
-//     return d.id;
-// }))
-// .force('charge', d3.forceManyBody().strength(-100))
-// .force('center', d3.forceCenter(center.x, center.y))
 
 let node_radius = 7;
 let encoding = 'None';
@@ -61,7 +56,8 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     let links = linkLayer.selectAll('.link')
         .data(graph.links)
         .enter()
-        .append('line');
+        .append('line')
+        .classed('link', true);
     // .attr('stroke-width', d => Math.sqrt(d.value));
     let nodeLayer = svg.append('g')
         .attr('class', 'nodes');
@@ -74,7 +70,25 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
-            .on("end", dragended));
+            .on("end", dragended))
+        .on('mouseover', function (cur_node) {
+            // Nodes
+            nodes.classed('faded', true);
+            // links.classed('faded', true);
+            d3.select(this)
+                .classed('faded', false);
+            cur_node.Partners.forEach(d => {
+                nodes.filter(t => t.id === d.country_id)
+                    .classed('faded', false);
+            });
+            // Links
+            links.filter(d => cur_node.id === d.source.id)
+                .classed('focus', true);
+        })
+        .on('mouseout', cur_node => {
+            nodes.classed('faded', false);
+            links.classed('focus', false);
+        });
     // TODO add hover function
 
     // Add labels to the nodes
@@ -143,23 +157,9 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
     simulation.nodes(graph.nodes)
         .on('tick', graph_update);
     // simulation.force("link")
-    //     .links(graph.links);
 
     draw_list();
 
-    // TODO refactoring below>>>
-    // simulation.on("tick", _ => {
-    //     // links
-    //     //     .attr("x1", d => d.source.x)
-    //     //     .attr("y1", d => d.source.y)
-    //     //     .attr("x2", d => d.target.x)
-    //     //     .attr("y2", d => d.target.y);
-    //     // nodes
-    //     //     .attr("cx", d => d.x)
-    //     //     .attr("cy", d => d.y)
-    //     // text
-    //     //     .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    // });
     function draw_list() {
         simulation.stop();
         if (!ranking || (ranking && encoding === 'None')) {
@@ -235,8 +235,15 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                 'Oceania': {x: 5 * cur_width / 6, y: height / 4},
             };
         }
-        if (global_l === 'circular') {
-            let r = Math.min(cur_width, cur_height) / 2 - 100;
+
+        function update_continent_centers(mode = 1) {
+            let r = 0;
+            if (mode === 1) {
+                r = Math.min(cur_width, cur_height) / 2 - 100;
+            }
+            else {
+                r = Math.min(cur_width, cur_height) * 0.75 - 50;
+            }
             let arc = d3.arc()
                 .outerRadius(r);
             let pie = d3.pie()
@@ -245,12 +252,19 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                 d.innerRadius = 0;
                 d.outerRadius = r;
                 d.x = arc.centroid(d)[0] + cur_width / 2;
-                d.y = arc.centroid(d)[1] + r + 50;
+                if (mode === 1) {
+                    d.y = arc.centroid(d)[1] + r + 50;
+                }
+                else {
+                    d.y = arc.centroid(d)[1] + r / 2 + 50;
+                }
                 continent_centers[d.data] = {x: d.x, y: d.y};
             });
-
         }
-        //    TODO add patch for group position
+
+        if (global_l === 'circular') {
+            update_continent_centers();
+        }
         if (global_l === 'force') {
             if (local_l === 'none') {
                 simulation.force('x', d3.forceX().strength(0.15).x(Math.min(window.innerWidth / 2, center.x)));
@@ -258,7 +272,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                 svg
                     .attr('height', height / 2 + 20);
             }
-            else {
+            if (local_l === 'force') {
                 simulation.force('x', d3.forceX().strength(0.15).x(d => continent_centers[d.Continent].x));
                 simulation.force('y', d3.forceY().strength(0.15).y(d => continent_centers[d.Continent].y));
                 svg
@@ -276,7 +290,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
             }
             if (local_l === 'none') {
                 simulation.stop();
-                let r = Math.min(cur_width, cur_height)*0.66;
+                let r = Math.min(cur_width, cur_height) * 0.66;
                 let arc = d3.arc()
                     .outerRadius(r);
                 let column = encoding === 'None' ? 'Name' : encoding;
@@ -291,20 +305,52 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                     pie = d3.pie()
                         .value((d, i) => 1);
                 }
-                graph.nodes = pie(graph.nodes).map((d,i) => {
+                graph.nodes = pie(graph.nodes).map((d, i) => {
                     d.innerRadius = 0;
                     d.outerRadius = r;
-                    d.data.x = arc.centroid(d)[0] + cur_width / 2 -30;
-                    d.data.y = arc.centroid(d)[1] + r/2 + 20;
+                    d.data.x = arc.centroid(d)[0] + cur_width / 2 - 30;
+                    d.data.y = arc.centroid(d)[1] + r / 2 + 20;
                     return d.data;
                 });
                 svg
-                    .attr('height', 2*height/3);
+                    .attr('height', 2 * height / 3);
                 graph_update(999);
             }
+            if (local_l === 'circular') {
+                simulation.stop();
+                update_continent_centers(2);
+                let r = 200;
+                let arc = d3.arc()
+                    .outerRadius(r);
+                let column = encoding === 'None' ? 'Name' : encoding;
 
+                let pie;
+                if (ranking) {
+                    pie = d3.pie()
+                        .sort((a, b) => a[column] - b[column])
+                        .value((d, i) => 1);
+                }
+                else {
+                    pie = d3.pie()
+                        .value((d, i) => 1);
+                }
+                let _new_nodes = [];
+                for (let continent in continent_centers) {
+                    let _new = pie(graph.nodes.filter(d => d.Continent === continent)).map((d, i) => {
+                        d.innerRadius = 0;
+                        d.outerRadius = r;
+                        d.data.x = arc.centroid(d)[0] + continent_centers[d.data.Continent].x;
+                        d.data.y = arc.centroid(d)[1] + continent_centers[d.data.Continent].y;
+                        return d.data;
+                    });
+                    _new_nodes = _new_nodes.concat(_new);
+                }
+                graph.nodes = _new_nodes;
+                svg
+                    .attr('height', 3 * height / 4);
+                graph_update(999);
+            }
         }
-
     }
 
     get_encode();
