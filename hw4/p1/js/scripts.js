@@ -235,7 +235,7 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                 'Oceania': {x: 5 * cur_width / 6, y: height / 4},
             };
         }
-        if (local_l === 'circular') {
+        if (global_l === 'circular') {
             let r = Math.min(cur_width, cur_height) / 2 - 100;
             let arc = d3.arc()
                 .outerRadius(r);
@@ -245,10 +245,10 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                 d.innerRadius = 0;
                 d.outerRadius = r;
                 d.x = arc.centroid(d)[0] + cur_width / 2;
-                d.y = arc.centroid(d)[1] + r+20;
+                d.y = arc.centroid(d)[1] + r + 50;
                 continent_centers[d.data] = {x: d.x, y: d.y};
             });
-            console.log(continent_centers);
+
         }
         //    TODO add patch for group position
         if (global_l === 'force') {
@@ -262,11 +262,46 @@ d3.json('data/countries_1995_2012.json', function (error, data) {
                 simulation.force('x', d3.forceX().strength(0.15).x(d => continent_centers[d.Continent].x));
                 simulation.force('y', d3.forceY().strength(0.15).y(d => continent_centers[d.Continent].y));
                 svg
-                    .attr('height', 2*height/3);
+                    .attr('height', 2 * height / 3);
             }
             simulation.alpha(1).restart();
         }
         else {
+            if (local_l === 'force') {
+                simulation.force('x', d3.forceX().strength(0.15).x(d => continent_centers[d.Continent].x));
+                simulation.force('y', d3.forceY().strength(0.15).y(d => continent_centers[d.Continent].y));
+                svg
+                    .attr('height', 3 * height / 4);
+                simulation.alpha(1).restart();
+            }
+            if (local_l === 'none') {
+                simulation.stop();
+                let r = Math.min(cur_width, cur_height)*0.66;
+                let arc = d3.arc()
+                    .outerRadius(r);
+                let column = encoding === 'None' ? 'Name' : encoding;
+
+                let pie;
+                if (ranking) {
+                    pie = d3.pie()
+                        .sort((a, b) => a[column] - b[column])
+                        .value((d, i) => 1);
+                }
+                else {
+                    pie = d3.pie()
+                        .value((d, i) => 1);
+                }
+                graph.nodes = pie(graph.nodes).map((d,i) => {
+                    d.innerRadius = 0;
+                    d.outerRadius = r;
+                    d.data.x = arc.centroid(d)[0] + cur_width / 2 -30;
+                    d.data.y = arc.centroid(d)[1] + r/2 + 20;
+                    return d.data;
+                });
+                svg
+                    .attr('height', 2*height/3);
+                graph_update(999);
+            }
 
         }
 
