@@ -11,13 +11,13 @@ class VotePercentageChart {
         //fetch the svg bounds
         this.svgBounds = divvotesPercentage.node().getBoundingClientRect();
         this.svgWidth = this.svgBounds.width - this.margin.left - this.margin.right;
-        this.svgHeight = 200;
+        this.svgHeight = 100;
 
         //add the svg to the div
         this.svg = divvotesPercentage.append("svg")
             .attr("width", this.svgWidth)
-            .attr("height", this.svgHeight);
-        this._mid = true;
+            .attr("height", this.svgHeight)
+            .attr("transform", "translate(" + this.margin.left + ",0)");
     }
 
     /**
@@ -187,6 +187,4 @@ class VotePercentageChart {
         //HINT: Use the chooseClass method to style your elements based on party wherever necessary.
 
     };
-
-
 }

@@ -67,7 +67,7 @@ h1 {
 
 .sideBar {
     display: inline-block;
-    width: 30%;
+    width: 25%;
     float:right;
 }
 
@@ -201,4 +201,7 @@ h3{
     font-size: 32px;
 }
 
+.faded {
+    opacity: 0.3;
+}
 

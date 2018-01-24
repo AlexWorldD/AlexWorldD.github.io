@@ -21,7 +21,7 @@ class TileChart {
         this.legendSvg = legend.append("svg")
             .attr("width", this.svgWidth)
             .attr("height", legendHeight)
-            .attr("transform", "translate(" + this.margin.left + ",0)")
+            .attr("transform", "translate(" + this.margin.left + ",0)");
         this.svg = divTiles.append("svg")
             .attr("width", this.svgWidth)
             .attr("height", this.svgHeight)
@@ -204,8 +204,23 @@ class TileChart {
         //Call the tool tip on hover over the tiles to display stateName, count of electoral votes
         //then, vote Percent and number of votes won by each party.
         //HINT: Use the .republican, .democrat and .independent classes to style your elements.
-
     };
+    faded(states) {
+        if (states.length>0) {
+            this.svg
+                .selectAll('.tiles')
+                .classed('faded', true);
+            this.svg
+                .selectAll('.tiles')
+                .filter(d=>states.includes(d.State))
+                .classed('faded', false);
+        }
+        else {
+            this.svg
+                .selectAll('.tiles')
+                .classed('faded', false);
+        }
+    }
 
 
 }

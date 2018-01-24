@@ -4,8 +4,9 @@ class ElectoralVoteChart {
      *
      * @param shiftChart an instance of the ShiftChart class
      */
-    constructor(shiftChart) {
+    constructor(shiftChart, tileChart) {
         this.shiftChart = shiftChart;
+        this.tileChart = tileChart;
 
         this.margin = {top: 30, right: 20, bottom: 30, left: 20};
         let divelectoralVotes = d3.select('#electoral-vote').classed('content', true);
@@ -13,13 +14,13 @@ class ElectoralVoteChart {
         //Gets access to the div element created for this chart from HTML
         this.svgBounds = divelectoralVotes.node().getBoundingClientRect();
         this.svgWidth = this.svgBounds.width - this.margin.left - this.margin.right;
-        this.svgHeight = 150;
+        this.svgHeight = 100;
 
         //creates svg element within the div
         this.svg = divelectoralVotes.append('svg')
             .attr('width', this.svgWidth)
-            .attr('height', this.svgHeight);
-        this._mid = true;
+            .attr('height', this.svgHeight)
+            .attr("transform", "translate(" + this.margin.left + ",0)");
 
     };
 
@@ -78,12 +79,15 @@ class ElectoralVoteChart {
                 }
             });
         const sum = d3.sum(data, d => d.Total_EV);
+        this.svg
+            .selectAll('rect')
+            .remove();
         let chart = this.svg
             .selectAll('rect')
             .data(data);
-        chart
-            .exit()
-            .remove();
+        // chart
+        //     .exit()
+        //     .remove();
         chart = chart
             .enter()
             .append('rect')
@@ -133,25 +137,28 @@ class ElectoralVoteChart {
             })
             .attr('class', d => ('electoralVoteText ' + this.chooseClass(d.Party)))
             .text(d => d.Votes);
-        if (this._mid) {
-            this.svg
-                .append('line')
-                .attr('x1', this.svgWidth/2)
-                .attr('x2', this.svgWidth/2)
-                .attr('y1', 40)
-                .attr('y2', 90)
-                .attr('class', 'middle_line');
-            this._mid = false
-        }
+        this.svg
+            .selectAll('.electoralVotesNote')
+            .remove();
+        this.svg
+            .selectAll('.middle_line')
+            .remove();
+        this.svg
+            .append('line')
+            .attr('x1', this.svgWidth / 2)
+            .attr('x2', this.svgWidth / 2)
+            .attr('y1', 40)
+            .attr('y2', 90)
+            .attr('class', 'middle_line');
         this.svg
             .append('text')
-            .attr('dx', this.svgWidth/2)
+            .attr('dx', this.svgWidth / 2)
             .attr('dy', 32)
             .attr('id', 'mid_elec')
             .attr('class', 'electoralVotesNote')
-            .text('Electoral Vote ('+(Math.ceil(sum/2)+1)+' needed to win)');
+            .text('Electoral Vote (' + (Math.ceil(sum / 2) + 1) + ' needed to win)');
 
-        
+
         //Group the states based on the winning party for the state;
         //then sort them based on the margin of victory
 
@@ -175,6 +182,22 @@ class ElectoralVoteChart {
         //HINT: Use the chooseClass method to style your elements based on party wherever necessary.
 
         //******* TODO: PART V *******
+
+        let brush = d3.brushX().extent([[0, 40], [this.svgWidth, 90]]).on("end", function () {
+            let _data = [];
+            if (d3.event.selection != null) {
+                _data = chart.filter(function (d) {
+                    return d3.select(this).attr('x') >= d3.event.selection[0]
+                        && d3.select(this).attr('x') <= d3.event.selection[1];
+                })
+                    ._groups[0]
+                    .map(d => d.__data__);
+            }
+            self.shiftChart.update(_data);
+            self.tileChart.faded(_data.map(d=>d.State));
+
+        });
+        this.svg.append("g").attr("class", "brush").call(brush);
         //Implement brush on the bar chart created above.
         //Implement a call back method to handle the brush end event.
         //Call the update method of shiftChart and pass the data corresponding to brush selection.
