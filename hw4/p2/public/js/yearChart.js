@@ -107,7 +107,7 @@ class YearChart {
             d3.csv('data/Year_Timeline_' + cur_year.YEAR + '.csv', function (error, electionResult) {
                 self.electoralVoteChart.update(electionResult, self.colorScale);
                 // self.tileChart.update(electionResult, self.ColorScale);
-                // self.votePercentageChart.update(electionResult);
+                self.votePercentageChart.update(electionResult);
             })
         })
             .on('mouseover', function (cur_year) {

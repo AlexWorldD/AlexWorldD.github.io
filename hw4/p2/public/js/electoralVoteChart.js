@@ -19,6 +19,7 @@ class ElectoralVoteChart {
         this.svg = divelectoralVotes.append('svg')
             .attr('width', this.svgWidth)
             .attr('height', this.svgHeight);
+        this._mid = true;
 
     };
 
@@ -132,19 +133,24 @@ class ElectoralVoteChart {
             })
             .attr('class', d => ('electoralVoteText ' + this.chooseClass(d.Party)))
             .text(d => d.Votes);
-        this.svg
-            .append('line')
-            .attr('x1', this.svgWidth/2)
-            .attr('x2', this.svgWidth/2)
-            .attr('y1', 40)
-            .attr('y2', 90)
-            .attr('class', 'middle_line');
+        if (this._mid) {
+            this.svg
+                .append('line')
+                .attr('x1', this.svgWidth/2)
+                .attr('x2', this.svgWidth/2)
+                .attr('y1', 40)
+                .attr('y2', 90)
+                .attr('class', 'middle_line');
+            this._mid = false
+        }
         this.svg
             .append('text')
             .attr('dx', this.svgWidth/2)
             .attr('dy', 32)
+            .attr('id', 'mid_elec')
             .attr('class', 'electoralVotesNote')
             .text('Electoral Vote ('+(Math.ceil(sum/2)+1)+' needed to win)');
+
         
         //Group the states based on the winning party for the state;
         //then sort them based on the margin of victory
