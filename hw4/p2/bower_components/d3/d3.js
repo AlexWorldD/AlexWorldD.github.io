@@ -13045,7 +13045,7 @@ var chord = function() {
 
     // Convert the sum to scaling factor for [0, 2pi].
     // TODO Allow start and end angle to be specified?
-    // TODO Allow padding to be specified as percentage?
+    // TODO Allow padding to be specified as Percent?
     k = max$1(0, tau$3 - padAngle * n) / k;
     dx = k ? padAngle : tau$3 / n;
 

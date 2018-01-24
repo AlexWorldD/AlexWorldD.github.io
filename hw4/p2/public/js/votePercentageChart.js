@@ -46,7 +46,7 @@ class VotePercentageChart {
     tooltip_render(tooltip_data) {
         let text = "<ul>";
         tooltip_data.forEach((row) => {
-            text += "<li class = " + this.chooseClass(row.Party) + ">" + row.Nominee + ":\t\t" + row.Votes + "(" + row.Percent + ")" + "</li>"
+            text += "<li class = " + this.chooseClass(row.Party) + ">" + row.Nominee + " " + row.Votes + " (" + row.Percent + ") " + "</li>"
         });
         return text + "</ul>"
     }
@@ -115,7 +115,7 @@ class VotePercentageChart {
             .append('g');
         VotesText
             .append('text')
-            .attr('dy', 20)
+            .attr('dy', 15)
             .attr('dx', function (d, i) {
                 if (i === 0) {
                     return 0;
@@ -145,30 +145,32 @@ class VotePercentageChart {
             })
             .attr('class', d => ('votesPercentageText ' + this.chooseClass(d.Party)))
             .text(d => d.Percent);
-
-        if (this._mid) {
-            this.svg
-                .append('line')
-                .attr('x1', this.svgWidth / 2)
-                .attr('x2', this.svgWidth / 2)
-                .attr('y1', 40)
-                .attr('y2', 90)
-                .attr('class', 'middle_line');
-            this.svg
-                .append('text')
-                .attr('dx', this.svgWidth / 2)
-                .attr('dy', 32)
-                .attr('class', 'electoralVotesNote')
-                .text('Popular Vote (50%)');
-            this._mid = false;
-        }
+        this.svg
+            .selectAll('.electoralVotesNote')
+            .remove();
+        this.svg
+            .selectAll('.middle_line')
+            .remove();
+        this.svg
+            .append('line')
+            .attr('x1', this.svgWidth / 2)
+            .attr('x2', this.svgWidth / 2)
+            .attr('y1', 40)
+            .attr('y2', 90)
+            .attr('class', 'middle_line');
+        this.svg
+            .append('text')
+            .attr('dx', this.svgWidth / 2)
+            .attr('dy', 32)
+            .attr('class', 'electoralVotesNote')
+            .text('Popular Vote (50%)');
         // ******* TODO: PART III *******
 
         //Create the stacked bar chart.
         //Use the global color scale to color code the rectangles.
         //HINT: Use .votesPercentage class to style your bars.
 
-        //Display the total percentage of votes won by each party
+        //Display the total Percent of votes won by each party
         //on top of the corresponding groups of bars.
         //HINT: Use the .votesPercentageText class to style your text elements;  Use this in combination with
         // chooseClass to get a color based on the party wherever necessary
@@ -180,7 +182,7 @@ class VotePercentageChart {
         //HINT: Use .votesPercentageNote class to style this text element
 
         //Call the tool tip on hover over the bars to display stateName, count of electoral votes.
-        //then, vote percentage and number of votes won by each party.
+        //then, vote Percent and number of votes won by each party.
 
         //HINT: Use the chooseClass method to style your elements based on party wherever necessary.
 
