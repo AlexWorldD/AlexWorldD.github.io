@@ -21,31 +21,38 @@ h1 {
 .info{
     margin-left: 20px;
 }
-.tile {
+.tile, .swatch {
     stroke: #FFF;
     stroke-width: 4;
+}
+.legendQuantile {
+    font-size: 12px;
 }
 
 .yearText, .tilestext, .brushtext{
     text-anchor:middle;
     font-size: 16px;
     fill: #565656;
-    stroke-width: 0.1px;
+    stroke-width: 1px;
     /*stroke: #e5e5e5;*/
 }
 
 .electoralVotesNote, .votesPercentageNote{
     text-anchor:middle;
-    font-size: 24px;
+    font-size: 12px;
 }
 
 .electoralVoteText, .votesPercentageText{
-    font-size: 35px;
+    font-size: 16px;
 }
 .end{
     text-anchor:end;
 }
-
+.middle_line {
+    stroke-width: 2px;
+    stroke: black;
+    z-index: 10;
+}
 .nomineeInfoText{
     font-size: 36px;
 }
@@ -60,12 +67,13 @@ h1 {
 
 .sideBar {
     display: inline-block;
-    width: 30%;
+    width: 25%;
     float:right;
 }
 
 .electoralVotes{
     stroke: #eee;
+    height: 30px;
 }
 
 .middlePoint{
@@ -128,7 +136,7 @@ h2{
     /*line-height: 5;*/
     padding-left: 10px;
     padding-right: 10px;
-    min-width: 400px;
+    min-width: 250px;
     border-style: groove;
     /*padding: 12px;*/
     background: #FFFFFF;
@@ -137,7 +145,7 @@ h2{
     pointer-events: none;
 }
 .tooltip-title{
-    font-size:18px;
+    font-size:14px;
     font-family: "Arial Black";
 
 }
@@ -193,4 +201,7 @@ h3{
     font-size: 32px;
 }
 
+.faded {
+    opacity: 0.3;
+}
 

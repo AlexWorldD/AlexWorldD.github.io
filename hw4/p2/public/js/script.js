@@ -5,7 +5,7 @@
 
         let shiftChart = new ShiftChart();
 
-        let electoralVoteChart = new ElectoralVoteChart(shiftChart);
+        let electoralVoteChart = new ElectoralVoteChart(shiftChart, tileChart);
 
 
 
