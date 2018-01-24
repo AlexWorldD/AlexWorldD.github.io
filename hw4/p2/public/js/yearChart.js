@@ -99,15 +99,15 @@ class YearChart {
                 .selectAll('circle')
                 .classed('selected', false)
                 .classed('highlighted', false)
-                .classed('faded', true)
+                .classed('faded', true);
             d3.select(this)
                 .select('circle')
                 .classed('faded', false)
                 .classed('selected', true);
-            d3.csv('data/Year_Timeline_' + d.YEAR + '.csv', function (error, electionResult) {
-                self.electoralVoteChart.update(electionResult, ColorScale);
-                self.tileChart.update(electionResult, ColorScale);
-                self.votePercentageChart.update(electionResult);
+            d3.csv('data/Year_Timeline_' + cur_year.YEAR + '.csv', function (error, electionResult) {
+                self.electoralVoteChart.update(electionResult, self.colorScale);
+                // self.tileChart.update(electionResult, self.ColorScale);
+                // self.votePercentageChart.update(electionResult);
             })
         })
             .on('mouseover', function (cur_year) {
