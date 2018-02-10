@@ -1,0 +1,15 @@
+/* TEAM */
+    Alex Maliutin
+    The God of this project and vino lover
+    GitHub Profile: https://github.com/AlexWorldD
+    Location: St. Petersburg, Russia
+    Website: www.alexworldd.github.io/SpaceVK
+
+/* THANKS */
+
+    Andrey Karsakov, Alexander Moiseev and Mr. Putin
+
+/* SITE */
+
+    CSS3, HTML5
+    d3, jQuery, Bootstrap

@@ -1,0 +1,16 @@
+# www.robotstxt.org/
+# For domain: http://alexworldd.github.io/SpaceVK
+User-Agent: *
+Disallow: /img/
+Disallow: /py/
+Disallow: /data/
+Crawl-delay: 5
+# Images section
+User-agent: Yandex/1.01.001 (compatible; Win16; P)
+Disallow: /
+User-agent: Googlebot-Image
+Disallow: /
+User-agent: yahoo-mmcrawler
+Disallow: /
+User-agent: psbot
+Disallow: /

@@ -1,0 +1,208 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.header {
+    background-color: white;
+    margin-bottom: 10px;
+}
+
+.carousel {
+    overflow: hidden
+}
+
+.github, .facebook, .vk {
+    color: gray;
+}
+
+.github:hover, .facebook:hover, .vk:hover {
+    color: black;
+}
+
+.site_header {
+    text-align: center;
+}
+#group_seletction {
+    margin-bottom: 25px;
+    margin-left: -30px;
+}
+#big_ch {
+    margin-bottom: 30px;
+}
+.city text {
+    font-size: 12px;
+    font-family: 'Roboto';
+    font-weight: 500;
+}
+.shade {
+    stroke: #fff;
+    stroke-width: 2px;
+    fill: #fff;
+    text-shadow: 0 0 2px 1.5px white;
+}
+#dim {
+    font-size: 14px;
+    font-family: 'Roboto';
+    font-weight: 300;
+}
+.groups label {
+    border: none;
+    font-size: 16px;
+    color: black;
+    text-align: center;
+    padding: 3px 3px;
+    margin-right: 1px;
+    margin-left: 1em;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.title {
+     color: #1946ba;
+     font-family: 'Roboto';
+     font-weight: 300;
+ }
+g.tick text, i {
+    color: #1946ba;
+    font-family: 'Roboto';
+    font-weight: 500;
+}
+.xAxis {
+    font-family: 'Roboto';
+    font-weight: 400;
+}
+#xValue {
+    font-family: 'Roboto';
+    font-weight: 300;
+}
+
+.line, .Space_Live {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+    stroke-linejoin: "round";
+    stroke-linecap: "round";
+}
+.green, .O_Cosmose {
+    stroke: #67b461;
+}
+.orange, .Ros_Cosmos {
+    stroke: #c2642b;
+}
+.magenta, .V_Cosmose {
+    stroke: #c366da;
+}
+select{
+    text-align-last:right;
+}
+#Encoding, #gender {
+    margin-left: 10px;
+    background: white;
+    border: 0;
+}
+#Encoding:hover, #Encoding:checked, #gender:hover, #gender:checked{
+    color: #1946ba;
+}
+path.line:hover {
+    stroke-width: 3px;
+}
+path.focus {
+    stroke-width: 3px;
+}
+path.faded {
+    stroke-opacity: 0.6;
+}
+.hover {
+    stroke-dasharray: 2,2;
+    opacity: 0.7;
+    stroke: gray;
+}
+.hover.hide, .legend.hide {
+    display: none;
+    opacity: 0;
+}
+#xValue.hide {
+    display: none;
+    opacity: 0;
+}
+.legend g text {
+    display: inline-block;
+}
+.no-gutters {
+    margin-right: 0;
+    margin-left: 0;
+    padding-right: 0;
+    padding-left: 0;
+}
+.no-gutters > .col, > [class*="col-"] {
+        padding-right: 0;
+        padding-left: 0;
+}
+#gender_select {
+    opacity: 0;
+}
+/*Map grid style*/
+.graticule {
+    stroke: grey;
+    stroke-width: 1px;
+    opacity: .2;
+    fill: none;
+    stroke-opacity: .1;
+    stroke-dasharray: 3, 1;
+    /*z-index: -1;*/
+}
+.regions {
+    stroke: #f7f7f7;
+    fill: #d9d9d9;
+}
+/*.big_check {*/
+    /*font-size: 28px;*/
+/*}*/
+.groupNames {
+    font-size: 16px;
+}
+
+/*UPDATE colors for checkboxes*/
+.pretty input:checked ~ .state.p-info label:after, .pretty.p-toggle .state.p-info label:after {
+     background-color: #c2642b !important
+ }
+.pretty input:checked ~ .state.p-info-o label:before, .pretty.p-toggle .state.p-info-o label:before {
+    border-color: #c2642b
+}
+.pretty input:checked ~ .state.p-info-o .icon, .pretty input:checked ~ .state.p-info-o .svg, .pretty input:checked ~ .state.p-info-o svg, .pretty.p-toggle .state.p-info-o .icon, .pretty.p-toggle .state.p-info-o .svg, .pretty.p-toggle .state.p-info-o svg {
+    color: #c2642b;
+    stroke: #c2642b
+}
+.pretty.p-default:not(.p-fill) input:checked ~ .state.p-info-o label:after {
+    background-color: #c2642b !important
+}
+/*2nd*/
+.pretty input:checked ~ .state.p-warning label:after, .pretty.p-toggle .state.p-warning label:after {
+    background-color: #c366da !important
+}
+.pretty input:checked ~ .state.p-warning-o label:before, .pretty.p-toggle .state.p-warning-o label:before {
+    border-color: #c366da;
+}
+.pretty input:checked ~ .state.p-warning-o .icon, .pretty input:checked ~ .state.p-warning-o .svg, .pretty input:checked ~ .state.p-info-o svg, .pretty.p-toggle .state.p-info-o .icon, .pretty.p-toggle .state.p-info-o .svg, .pretty.p-toggle .state.p-info-o svg {
+    color: #c366da;
+    stroke: #c366da;
+}
+.pretty.p-default:not(.p-fill) input:checked ~ .state.p-warning-o label:after {
+    background-color: #c366da !important
+}
+.pretty.p-bigger .icon, .pretty.p-bigger .img, .pretty.p-bigger .svg, .pretty.p-bigger label:after, .pretty.p-bigger label:before {
+    font-size: 2.3em !important;
+    top: -0.35em !important
+}
+
+.pretty.p-bigger label {
+    text-indent: 3em
+}
+
+blockquote p {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+blockquote small {
+    color: gray;
+}
